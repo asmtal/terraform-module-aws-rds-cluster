@@ -1,5 +1,5 @@
 repos:
-  - repo: ck-ev-test/terraform-module-rds-cluster
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
     rev: v1.62.3
     hooks:
       - id: terraform_fmt
