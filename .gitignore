@@ -30,3 +30,6 @@ terraform.rc
 
 # S3 import example
 backup
+
+#.idea
+.idea
