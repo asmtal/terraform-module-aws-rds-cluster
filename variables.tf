@@ -11,8 +11,8 @@ variable "context" {
   type        = string
   description = "Optional context of module usage. Max 10 characters. E.g. `backend`, `frontend` etc."
   validation {
-    condition     = length(var.project) >=2 && length(var.project)<=10
-    error_message = "app_name variable length must be between 2 and 10 characters."
+    condition     = length(var.context) >=2 && length(var.context)<=10
+    error_message = "The `context` variable length must be between 2 and 10 characters."
   }
 }
 
@@ -84,20 +84,12 @@ variable "monitoring_role_arn" {
   description = "IAM role used by RDS to send enhanced monitoring metrics to CloudWatch"
   type        = string
   default     = ""
-  validation {
-    condition     = var.create_monitoring_role ? var.monitoring_role_arn == "" : var.monitoring_role_arn != ""
-    error_message = var.create_monitoring_role ? "'create_monitoring_role' is true. 'monitoring_role_arn' must be empty" : "'create_monitoring_role' is false. 'monitoring_role_arn' must be set"
-  }
 }
 
 variable "backtrack_window" {
   description = "The target backtrack window, in seconds. Only available for `aurora` engine currently. To disable backtracking, set this value to 0. Must be between 0 and 259200 (72 hours)"
   type        = number
   default     = null
-  validation {
-    condition     = var.backtrack_window !=null ? var.backtrack_window >= 0 && var.backtrack_window <= 259200 : true
-    error_message = "'backtrack_window' must be between 0 and 259200"
-  }
 }
 
 variable "apply_immediately" {
@@ -219,13 +211,9 @@ variable "auto_minor_version_upgrade" {
 }
 
 variable "instances_count" {
-  description = "Indicates the number of db instances. If `worklaod` == prod, `instances_count` should be at least 2. Default `1`"
+  description = "Indicates the number of db instances. Default `2`"
   type        = number
   default     = 2
-  validation {
-    condition     = var.workload == "prod" ? var.instances_count >= 2 : true
-    error_message = var.workload == "prod" ? "For `worklaod` == prod `instances_count` should be at least 2" : ""
-  }
 }
 
 variable "performance_insights_enabled" {
