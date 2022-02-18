@@ -17,13 +17,16 @@ locals {
   publicly_accessible         = false
   backup_retention_period     = var.workload == "prod" ? 35 : 7
   default-tags                = {
-    Project         = var.project
-    Environment     = var.environment
-    AppName         = var.context
-    TerraformModule = "rds-aurora"
+    project         = var.project
+    environment     = var.environment
+    app_name         = var.context
+    terraform_module = "rds-aurora"
   }
-  tags = merge(local.default-tags, var.extra-tags)
-  name = "${var.project}-${var.context}-${var.environment}"
+  tags                          = merge(local.default-tags, var.extra-tags)
+  #resources names
+  name                          = "${var.project}-${var.context}-${var.environment}"
+  sg_gr_name                    = "${var.project}-${var.context}-rds-traffice-${var.environment}"
+  enhanced_monitoring_role_name = "${var.project}-${var.context}-rds-enhanced-monitring-${var.environment}"
 }
 
 # Ref. https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#genref-aws-service-namespaces
@@ -155,7 +158,7 @@ data "aws_iam_policy_document" "monitoring_rds_assume_role" {
 resource "aws_iam_role" "rds_enhanced_monitoring" {
   count = var.create_cluster && var.create_monitoring_role && var.monitoring_interval > 0 ? 1 : 0
 
-  name        = "${var.project}-${var.context}-rds-enhanced-monitring-${var.environment}"
+  name        = local.enhanced_monitoring_role_name
   description = "Enhanced monitoing Role for RDS Aurora ${local.name}"
 
   tags               = local.tags
@@ -176,11 +179,11 @@ resource "aws_iam_role_policy_attachment" "rds_enhanced_monitoring" {
 resource "aws_security_group" "this" {
   count = var.create_cluster ? 1 : 0
 
-  name_prefix = "${local.name}-"
+  name        = local.sg_gr_name
   vpc_id      = var.vpc_id
   description = "Control traffic to/from RDS Aurora ${local.name}"
 
-  tags = local.tags
+  tags = merge(local.tags, { Name = local.sg_gr_name })
 }
 #
 ## TODO - change to map of ingress rules under one resource at next breaking change
