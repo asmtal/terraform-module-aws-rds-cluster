@@ -18,7 +18,7 @@ variable "context" {
 
 variable "environment" {
   type        = string
-  description = "Environment acronym. Valid Values: `prod`, `green`, `blue`, `stage`, `uat`, `qa`, `test`, `dev`"
+  description = "Environment acronym. Valid Values: `prod`, `green`, `blue`, `stage`, `uat`, `qa`, `test`, `dev`."
   validation {
     condition     = contains(["prod", "green", "blue", "stage", "uat", "qa", "test", "dev"], var.environment)
     error_message = "Allowed values for engine are \"prod\", \"green\", \"blue\", \"stage\", \"uat\", \"qa\", \"test\", or \"dev\"."
