@@ -27,7 +27,7 @@ variable "environment" {
 
 variable "workload" {
   type        = string
-  description = "Workload acronym. Valid Values: `prod`, `non-prod`"
+  description = "Workload acronym. Valid Values: `prod`, `non-prod`."
   validation {
     condition     = contains(["prod", "non-prod"], var.workload)
     error_message = "Allowed values for workload are \"prod\", \"non-prod\"."
