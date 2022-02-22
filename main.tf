@@ -19,13 +19,13 @@ locals {
   default-tags = {
     Project         = var.project
     Environment     = var.environment
-    AppName         = var.context
+    Context         = var.context
     TerraformModule = "rds-aurora"
   }
   tags = merge(local.default-tags, var.extra-tags)
   #resources names
   name                          = "${var.project}-${var.context}-${var.environment}"
-  sg_gr_name                    = "${var.project}-${var.context}-rds-traffice-${var.environment}"
+  sg_gr_name                    = "${var.project}-${var.context}-rds-traffic-${var.environment}"
   enhanced_monitoring_role_name = "${var.project}-${var.context}-rds-enhanced-monitring-${var.environment}"
 }
 
@@ -104,12 +104,12 @@ resource "aws_rds_cluster" "this" {
 }
 
 resource "aws_rds_cluster_instance" "this" {
-  for_each = var.create_cluster ? var.instances_count : 0
+  count = var.create_cluster ? var.instances_count : 0
 
   # Notes:
   # Do not set preferred_backup_window - its set at the cluster level and will error if provided here
 
-  identifier                            = "${local.name}-${each.key}"
+  identifier                            = "${local.name}-${count.index}"
   cluster_identifier                    = try(aws_rds_cluster.this[0].id, "")
   engine                                = var.engine
   engine_version                        = var.engine_version
