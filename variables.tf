@@ -75,7 +75,7 @@ variable "engine_mode" {
 
 # Enhanced monitoring role
 variable "create_monitoring_role" {
-  description = "Determines whether to create the IAM role for RDS enhanced monitoring"
+  description = "Determines whether to create the IAM role for RDS enhanced monitoring."
   type        = bool
   default     = true
 }
