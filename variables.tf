@@ -64,7 +64,7 @@ variable "random_password_length" {
 
 
 variable "engine_mode" {
-  description = "The database engine mode. Valid values: `global`, `multimaster`, `parallelquery`, `provisioned`. Defaults to: `provisioned`"
+  description = "The database engine mode. Valid values: `global`, `multimaster`, `parallelquery`, `provisioned`. Defaults to: `provisioned`."
   type        = string
   default     = "provisioned"
   validation {
