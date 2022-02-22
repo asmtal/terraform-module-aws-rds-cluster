@@ -236,13 +236,13 @@ resource "aws_ssm_parameter" "endpoint_writer" {
   count = var.create_cluster ? 1 : 0
   name  = "/rds/${local.name}/db_writer_endpoint"
   type  = "String"
-  value = aws_rds_cluster.this.endpoint
+  value = aws_rds_cluster.this[count.index].endpoint
 }
 resource "aws_ssm_parameter" "endpoint_reader" {
   count = var.create_cluster ? 1 : 0
   name  = "/rds/${local.name}/db_reader_endpoint"
   type  = "String"
-  value = aws_rds_cluster.this.reader_endpoint
+  value = aws_rds_cluster.this[count.index].reader_endpoint
 }
 
 resource "aws_ssm_parameter" "port" {
