@@ -17,10 +17,10 @@ locals {
   publicly_accessible         = false
   backup_retention_period     = var.workload == "prod" ? 35 : 7
   default-tags                = {
-    project         = var.project
-    environment     = var.environment
-    app_name         = var.context
-    terraform_module = "rds-aurora"
+    Project         = var.project
+    Environment     = var.environment
+    AppName         = var.context
+    TerraformModule = "rds-aurora"
   }
   tags                          = merge(local.default-tags, var.extra-tags)
   #resources names
