@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0](https://github.com/ck-ev-test/terraform-module-rds-cluster/compare/v1.0.1...v1.1.0) (2022-02-22)
+
+
+### Features
+
+* save db data in param store ([201352c](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/201352c2ffd7080af9e79098c79e1855ede7f3bb))
+
 ### [1.0.1](https://github.com/ck-ev-test/terraform-module-rds-cluster/compare/v1.0.0...v1.0.1) (2022-02-22)
 
 
