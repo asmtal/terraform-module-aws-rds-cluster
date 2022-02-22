@@ -3,7 +3,6 @@ locals {
 
   db_subnet_group_name          = var.create_db_subnet_group ? join("", aws_db_subnet_group.this.*.name) : var.db_subnet_group_name
   internal_db_subnet_group_name = try(coalesce(var.db_subnet_group_name, local.name), "")
-  master_password               = random_password.master_password[0].result
   backtrack_window              = var.engine == "aurora-mysql" || var.engine == "aurora" ? var.backtrack_window : 0
 
   rds_enhanced_monitoring_arn = var.create_monitoring_role ? join("", aws_iam_role.rds_enhanced_monitoring.*.arn) : var.monitoring_role_arn
@@ -69,9 +68,9 @@ resource "aws_rds_cluster" "this" {
   engine_version                      = var.engine_version
   allow_major_version_upgrade         = local.allow_major_version_upgrade
   kms_key_id                          = var.kms_key_id
-  database_name                       = var.database_name
+  database_name                       = var.default_database_name
   master_username                     = var.master_username
-  master_password                     = local.master_password
+  master_password                     = random_password.master_password[count.index].result
   final_snapshot_identifier           = "${local.name}-${element(concat(random_id.snapshot_identifier.*.hex, [""]), 0)}"
   skip_final_snapshot                 = local.skip_final_snapshot
   deletion_protection                 = local.deletion_protection
@@ -231,3 +230,45 @@ resource "aws_security_group" "this" {
 #  prefix_list_ids          = lookup(each.value, "prefix_list_ids", null)
 #  source_security_group_id = lookup(each.value, "source_security_group_id", null)
 #}
+
+
+resource "aws_ssm_parameter" "endpoint" {
+  count = var.create_cluster ? 1 : 0
+  name  = "/rds/${local.name}/db_writer_endpoint"
+  type  = "String"
+  value = aws_rds_cluster.this.endpoint
+}
+resource "aws_ssm_parameter" "endpoint" {
+  count = var.create_cluster ? 1 : 0
+  name  = "/rds/${local.name}/db_reader_endpoint"
+  type  = "String"
+  value = aws_rds_cluster.this.reader_endpoint
+}
+
+resource "aws_ssm_parameter" "port" {
+  count = var.create_cluster ? 1 : 0
+  name  = "/rds//${local.name}/db_port"
+  type  = "String"
+  value = local.port
+}
+
+resource "aws_ssm_parameter" "database" {
+  count = var.create_cluster ? 1 : 0
+  name  = "/rds/${local.name}/db_default_database"
+  type  = "String"
+  value = var.default_database_name
+}
+
+resource "aws_ssm_parameter" "username" {
+  count = var.create_cluster ? 1 : 0
+  name  = "/rds/${local.name}/db_master_username"
+  type  = "SecureString"
+  value = var.master_username
+}
+
+resource "aws_ssm_parameter" "password" {
+  count = var.create_cluster ? 1 : 0
+  name  = "/rds/${local.name}/db_master_password"
+  type  = "SecureString"
+  value = random_password.master_password[count.index].result
+}
