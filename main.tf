@@ -16,13 +16,13 @@ locals {
   allow_major_version_upgrade = false
   publicly_accessible         = false
   backup_retention_period     = var.workload == "prod" ? 35 : 7
-  default-tags                = {
+  default-tags = {
     Project         = var.project
     Environment     = var.environment
     AppName         = var.context
     TerraformModule = "rds-aurora"
   }
-  tags                          = merge(local.default-tags, var.extra-tags)
+  tags = merge(local.default-tags, var.extra-tags)
   #resources names
   name                          = "${var.project}-${var.context}-${var.environment}"
   sg_gr_name                    = "${var.project}-${var.context}-rds-traffice-${var.environment}"
@@ -41,7 +41,7 @@ resource "random_password" "master_password" {
 }
 
 resource "random_id" "snapshot_identifier" {
-  count   = var.create_cluster ? 1 : 0
+  count = var.create_cluster ? 1 : 0
   keepers = {
     id = local.name
   }
@@ -104,7 +104,7 @@ resource "aws_rds_cluster" "this" {
 }
 
 resource "aws_rds_cluster_instance" "this" {
-  for_each = var.create_cluster  ? var.instances_count : 0
+  for_each = var.create_cluster ? var.instances_count : 0
 
   # Notes:
   # Do not set preferred_backup_window - its set at the cluster level and will error if provided here

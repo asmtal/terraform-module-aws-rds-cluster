@@ -2,7 +2,7 @@ variable "project" {
   type        = string
   description = "Project acronym. Min 2 characters, max 4 characters."
   validation {
-    condition     = length(var.project) >=2 && length(var.project)<=4
+    condition     = length(var.project) >= 2 && length(var.project) <= 4
     error_message = "Project variable length must be between 2 and 4 characters."
   }
 }
@@ -11,7 +11,7 @@ variable "context" {
   type        = string
   description = "Optional context of module usage. Max 10 characters. E.g. `backend`, `frontend` etc."
   validation {
-    condition     = length(var.context) >=2 && length(var.context)<=10
+    condition     = length(var.context) >= 2 && length(var.context) <= 10
     error_message = "The `context` variable length must be between 2 and 10 characters."
   }
 }
@@ -20,7 +20,7 @@ variable "environment" {
   type        = string
   description = "Environment acronym. Valid Values: `prod`, `green`, `blue`, `stage`, `uat`, `qa`, `test`, `dev`"
   validation {
-    condition     = contains(["prod", "green", "blue","stage","uat","qa","test","dev"], var.environment)
+    condition     = contains(["prod", "green", "blue", "stage", "uat", "qa", "test", "dev"], var.environment)
     error_message = "Allowed values for engine are \"prod\", \"green\", \"blue\", \"stage\", \"uat\", \"qa\", \"test\", or \"dev\"."
   }
 }
