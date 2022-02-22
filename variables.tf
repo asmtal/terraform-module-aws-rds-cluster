@@ -81,7 +81,7 @@ variable "create_monitoring_role" {
 }
 
 variable "monitoring_role_arn" {
-  description = "IAM role used by RDS to send enhanced monitoring metrics to CloudWatch"
+  description = "IAM role used by RDS to send enhanced monitoring metrics to CloudWatch."
   type        = string
   default     = ""
 }
