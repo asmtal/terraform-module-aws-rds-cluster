@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0](https://github.com/ck-ev-test/terraform-module-rds-cluster/compare/v1.1.0...v1.2.0) (2022-02-22)
+
+
+### Features
+
+* fix modules name ([e3abeb6](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/e3abeb609d558a5895ceab3b63b50ed6333ed187))
+
 ## [1.1.0](https://github.com/ck-ev-test/terraform-module-rds-cluster/compare/v1.0.1...v1.1.0) (2022-02-22)
 
 
