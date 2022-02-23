@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### [1.2.2](https://github.com/ck-ev-test/terraform-module-rds-cluster/compare/v1.2.1...v1.2.2) (2022-02-23)
+
+
+### Bug Fixes
+
+* ssm param & change subnet variable optionality ([db61a9d](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/db61a9d03501a6a5738eea756adceae881a9f330))
+
 ### [1.2.1](https://github.com/ck-ev-test/terraform-module-rds-cluster/compare/v1.2.0...v1.2.1) (2022-02-22)
 
 
