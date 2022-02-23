@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### [1.2.3](https://github.com/ck-ev-test/terraform-module-rds-cluster/compare/v1.2.2...v1.2.3) (2022-02-23)
+
+
+### Bug Fixes
+
+* change default db_name ([5f37c7f](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/5f37c7f5c5937cc6d903305326c23a9853903684))
+
 ### [1.2.2](https://github.com/ck-ev-test/terraform-module-rds-cluster/compare/v1.2.1...v1.2.2) (2022-02-23)
 
 
