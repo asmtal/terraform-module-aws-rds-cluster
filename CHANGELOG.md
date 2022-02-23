@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0](https://github.com/ck-ev-test/terraform-module-rds-cluster/compare/v1.2.4...v1.3.0) (2022-02-23)
+
+
+### Features
+
+* extract identity object ([ccb7593](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/ccb759355857498940ec5527ec177a2d0c36fae9))
+
 ### [1.2.4](https://github.com/ck-ev-test/terraform-module-rds-cluster/compare/v1.2.3...v1.2.4) (2022-02-23)
 
 
