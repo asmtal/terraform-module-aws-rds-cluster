@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### [1.3.1](https://github.com/ck-ev-test/terraform-module-rds-cluster/compare/v1.3.0...v1.3.1) (2022-02-23)
+
+
+### Bug Fixes
+
+* add default tag ([ef92f50](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/ef92f50057efa9190d18b78eb793959a8bea9905))
+
 ## [1.3.0](https://github.com/ck-ev-test/terraform-module-rds-cluster/compare/v1.2.4...v1.3.0) (2022-02-23)
 
 
