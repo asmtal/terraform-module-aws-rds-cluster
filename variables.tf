@@ -1,6 +1,6 @@
 variable "identity" {
   type = object({
-    project = string,
+    project     = string,
     environment = string
     source_repo = string
   })
@@ -174,7 +174,7 @@ variable "preferred_maintenance_window" {
   default     = "sun:05:00-sun:06:00"
 }
 
-variable "monitoring_interval" {
+variable "monitoring_interval_seconds" {
   description = "The interval, in seconds, between points when Enhanced Monitoring metrics are collected for instances. Set to `0` to disble. Default is `0`"
   type        = number
   default     = 0

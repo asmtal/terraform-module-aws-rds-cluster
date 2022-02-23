@@ -16,10 +16,11 @@ locals {
   publicly_accessible         = false
   backup_retention_period     = var.identity.environment == "prod" ? 35 : 7
   default-tags = {
-    Project         = var.identity.project
-    Environment     = var.identity.environment
-    Context         = var.context
-    TerraformModule = "rds-aurora"
+    Project          = var.identity.project
+    Environment      = var.identity.environment
+    Context          = var.context
+    TerraformModule  = "rds-aurora"
+    SourceRepository = var.identity.source_repo
   }
   tags = merge(local.default-tags, var.extra-tags)
   #resources names
@@ -118,7 +119,7 @@ resource "aws_rds_cluster_instance" "this" {
   db_parameter_group_name               = var.db_parameter_group_name
   apply_immediately                     = var.apply_immediately
   monitoring_role_arn                   = local.rds_enhanced_monitoring_arn
-  monitoring_interval                   = var.monitoring_interval
+  monitoring_interval                   = var.monitoring_interval_seconds
   preferred_maintenance_window          = var.preferred_maintenance_window
   auto_minor_version_upgrade            = var.auto_minor_version_upgrade
   performance_insights_enabled          = var.performance_insights_enabled
@@ -155,7 +156,7 @@ data "aws_iam_policy_document" "monitoring_rds_assume_role" {
 }
 
 resource "aws_iam_role" "rds_enhanced_monitoring" {
-  count = var.create_cluster && var.create_monitoring_role && var.monitoring_interval > 0 ? 1 : 0
+  count = var.create_cluster && var.create_monitoring_role && var.monitoring_interval_seconds > 0 ? 1 : 0
 
   name        = local.enhanced_monitoring_role_name
   description = "Enhanced monitoing Role for RDS Aurora ${local.name}"
@@ -165,7 +166,7 @@ resource "aws_iam_role" "rds_enhanced_monitoring" {
 }
 
 resource "aws_iam_role_policy_attachment" "rds_enhanced_monitoring" {
-  count = var.create_cluster && var.create_monitoring_role && var.monitoring_interval > 0 ? 1 : 0
+  count = var.create_cluster && var.create_monitoring_role && var.monitoring_interval_seconds > 0 ? 1 : 0
 
   role       = aws_iam_role.rds_enhanced_monitoring[0].name
   policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
