@@ -1,9 +1,12 @@
-variable "project" {
-  type        = string
-  description = "Project acronym. Min 2 characters, max 4 characters."
+variable "identity" {
+  type = object({
+    project = string,
+    environment = string
+    source_repo = string
+  })
   validation {
-    condition     = length(var.project) >= 2 && length(var.project) <= 4
-    error_message = "Project variable length must be between 2 and 4 characters."
+    condition     = contains(["prod", "green", "blue", "stage", "uat", "qa", "test", "dev"], var.identity.environment) && length(var.identity.project) >= 2 && length(var.identity.project) <= 4
+    error_message = "Allowed values for environment are \"prod\", \"green\", \"blue\", \"stage\", \"uat\", \"qa\", \"test\", or \"dev\". Project variable length must be between 2 and 4 characters."
   }
 }
 
@@ -16,23 +19,7 @@ variable "context" {
   }
 }
 
-variable "environment" {
-  type        = string
-  description = "Environment acronym. Valid Values: `prod`, `green`, `blue`, `stage`, `uat`, `qa`, `test`, `dev`."
-  validation {
-    condition     = contains(["prod", "green", "blue", "stage", "uat", "qa", "test", "dev"], var.environment)
-    error_message = "Allowed values for engine are \"prod\", \"green\", \"blue\", \"stage\", \"uat\", \"qa\", \"test\", or \"dev\"."
-  }
-}
 
-variable "workload" {
-  type        = string
-  description = "Workload acronym. Valid Values: `prod`, `non-prod`."
-  validation {
-    condition     = contains(["prod", "non-prod"], var.workload)
-    error_message = "Allowed values for workload are \"prod\", \"non-prod\"."
-  }
-}
 
 # aws_rds_cluster
 variable "create_cluster" {

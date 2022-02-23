@@ -14,18 +14,18 @@ locals {
   copy_tags_to_snapshot       = true
   allow_major_version_upgrade = false
   publicly_accessible         = false
-  backup_retention_period     = var.workload == "prod" ? 35 : 7
+  backup_retention_period     = var.identity.environment == "prod" ? 35 : 7
   default-tags = {
-    Project         = var.project
-    Environment     = var.environment
+    Project         = var.identity.project
+    Environment     = var.identity.environment
     Context         = var.context
     TerraformModule = "rds-aurora"
   }
   tags = merge(local.default-tags, var.extra-tags)
   #resources names
-  name                          = "${var.project}-${var.context}-${var.environment}"
-  sg_gr_name                    = "${var.project}-${var.context}-rds-traffic-${var.environment}"
-  enhanced_monitoring_role_name = "${var.project}-${var.context}-rds-enhanced-monitring-${var.environment}"
+  name                          = "${var.identity.project}-${var.context}-${var.identity.environment}"
+  sg_gr_name                    = "${var.identity.project}-${var.context}-rds-traffic-${var.identity.environment}"
+  enhanced_monitoring_role_name = "${var.identity.project}-${var.context}-rds-enhanced-monitring-${var.identity.environment}"
 }
 
 # Ref. https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#genref-aws-service-namespaces
