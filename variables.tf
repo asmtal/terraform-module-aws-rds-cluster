@@ -166,7 +166,7 @@ variable "kms_key_id" {
 variable "default_database_name" {
   description = "Name for an automatically created database on cluster creation. Defaults to `default`"
   type        = string
-  default     = "db_default"
+  default     = "default_db"
 }
 
 variable "master_username" {
