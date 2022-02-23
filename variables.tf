@@ -139,7 +139,6 @@ variable "db_subnet_group_name" {
 variable "subnets" {
   description = "List of subnet IDs used by database subnet group created"
   type        = list(string)
-  default     = []
 }
 
 variable "extra-tags" {

@@ -247,7 +247,7 @@ resource "aws_ssm_parameter" "endpoint_reader" {
 
 resource "aws_ssm_parameter" "port" {
   count = var.create_cluster ? 1 : 0
-  name  = "/rds//${local.name}/db_port"
+  name  = "/rds/${local.name}/db_port"
   type  = "String"
   value = local.port
 }
