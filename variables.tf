@@ -5,28 +5,30 @@ variable "identity" {
     source_repo = string
   })
   validation {
-    condition     = contains(["prod", "green", "blue", "stage", "uat", "qa", "test", "dev"], var.identity.environment) && length(var.identity.project) >= 2 && length(var.identity.project) <= 4
-    error_message = "Allowed values for environment are \"prod\", \"green\", \"blue\", \"stage\", \"uat\", \"qa\", \"test\", or \"dev\". Project variable length must be between 2 and 4 characters."
+    condition = contains([
+      "prod", "green", "blue", "stage", "uat", "qa", "qa0", "qa1", "qa1",
+      "test", "test0", "test1", "test2", "dev", "dev0", "dev1", "dev2"
+    ], var.identity.environment) && length(var.identity.project) >= 2 && length(var.identity.project) <= 4
+    error_message = "Allowed values for environment are \"prod\", \"green\", \"blue\", \"stage\", \"uat\", \"qa\", \"qa0\", \"qa1\", \"qa2\", \"test\", \"test0\", \"test1\", \"test2\", \"dev\", \"dev0\", \"dev1\", or \"dev2\". Project variable length must be between 2 and 10 characters."
   }
 }
 
 variable "context" {
   type        = string
-  description = "Optional context of module usage. Max 10 characters. E.g. `backend`, `frontend` etc."
+  description = "Context of module usage. Max 10 characters. E.g. `backend`, `frontend` etc."
   validation {
     condition     = length(var.context) >= 2 && length(var.context) <= 10
     error_message = "The `context` variable length must be between 2 and 10 characters."
   }
 }
 
-
-
 # aws_rds_cluster
-variable "create_cluster" {
-  description = "Whether cluster should be created (affects nearly all resources)"
+variable "enabled" {
+  description = "Indicates whether all reaoruces inside module should be created (affects nearly all resources)"
   type        = bool
   default     = true
 }
+
 variable "port" {
   description = "The port on which the DB accepts connections. Defaults to aurora-postgres port `5432`"
   type        = string
@@ -34,11 +36,12 @@ variable "port" {
 }
 
 variable "engine" {
-  description = "The name of the database engine to be used for this DB cluster. Defaults to `aurora-postgresql`. Valid Values: `aurora`, `aurora-mysql`, `aurora-postgresql`"
+  description = "The name of the database engine to be used for this DB cluster. Valid Values: `aurora`, `aurora-mysql`, `aurora-postgresql`"
   type        = string
-  default     = "aurora-postgresql"
   validation {
-    condition     = contains(["aurora", "aurora-mysql", "aurora-postgresql"], var.engine)
+    condition = contains([
+      "aurora", "aurora-mysql", "aurora-postgresql"
+    ], var.engine)
     error_message = "Allowed values for engine are \"aurora\", \"aurora-mysql\", or \"aurora-postgresql\"."
   }
 }
@@ -55,22 +58,28 @@ variable "engine_mode" {
   type        = string
   default     = "provisioned"
   validation {
-    condition     = contains(["global", "parallelquery", "provisioned", "multimaster"], var.engine_mode)
+    condition = contains([
+      "global", "parallelquery", "provisioned", "multimaster"
+    ], var.engine_mode)
     error_message = "Allowed values for engine_mode are \"global\", \"parallelquery-mysql\", \"provisioned\", or \"multimaster\"."
   }
 }
 
 # Enhanced monitoring role
-variable "create_monitoring_role" {
-  description = "Determines whether to create the IAM role for RDS enhanced monitoring."
-  type        = bool
-  default     = true
-}
-
-variable "monitoring_role_arn" {
-  description = "IAM role used by RDS to send enhanced monitoring metrics to CloudWatch."
-  type        = string
-  default     = ""
+variable "enhanced_monitoring" {
+  description = "Configuration for RDS enhanced monitoring. By default creates monitoring role inside module (self_create=true)."
+  type        = object({
+    self_create       = bool
+    external_role_arn = string
+  })
+  default = {
+    self_create       = true
+    external_role_arn = null
+  }
+  validation {
+    condition     = !var.enhanced_monitoring.self_create ? var.enhanced_monitoring.external_role_arn !=null : var.enhanced_monitoring.self_create
+    error_message = "Variable 'external_role_arn' must not be null when 'self_create'=false."
+  }
 }
 
 variable "backtrack_window" {
@@ -214,7 +223,7 @@ variable "performance_insights_kms_key_id" {
   default     = null
 }
 
-variable "performance_insights_retention_period" {
+variable "performance_insights_retention_period_days" {
   description = "Amount of time in days to retain Performance Insights data. Either 7 (7 days) or 731 (2 years)"
   type        = number
   default     = null
@@ -236,4 +245,31 @@ variable "db_cluster_db_instance_parameter_group_name" {
   description = "Instance parameter group to associate with all instances of the DB cluster. The `db_cluster_db_instance_parameter_group_name` is only valid in combination with `allow_major_version_upgrade`"
   type        = string
   default     = null
+}
+variable "skip_final_snapshot" {
+  description = "Determines whether a final snapshot is created before the cluster is deleted. If true is specified, no snapshot is created. Default to 'true'."
+  type        = bool
+  default     = true
+}
+
+variable "copy_tags_to_snapshot" {
+  description = "Copy all Cluster `tags` to snapshots. Default to 'true'."
+  type        = bool
+  default     = true
+}
+
+variable "allow_major_version_upgrade" {
+  description = "Enable to allow major engine version upgrades when changing engine versions. Defaults to `false`"
+  type        = bool
+  default     = false
+}
+variable "deletion_protection" {
+  description = "If the DB instance should have deletion protection enabled. The database can't be deleted when this value is set to `true`. The default is `true`"
+  type        = bool
+  default     = true
+}
+variable "backup_retention_period_days" {
+  description = "The days to retain backups for. Max is 35 days. Default `7`"
+  type        = number
+  default     = 7
 }

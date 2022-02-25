@@ -5,16 +5,8 @@ locals {
   internal_db_subnet_group_name = try(coalesce(var.db_subnet_group_name, local.name), "")
   backtrack_window              = var.engine == "aurora-mysql" || var.engine == "aurora" ? var.backtrack_window : 0
 
-  rds_enhanced_monitoring_arn = var.create_monitoring_role ? join("", aws_iam_role.rds_enhanced_monitoring.*.arn) : var.monitoring_role_arn
   rds_security_group_id       = join("", aws_security_group.this.*.id)
-  #fixed params - not allowed to be changed
-  storage_encrypted           = true
-  skip_final_snapshot         = false
-  deletion_protection         = true
-  copy_tags_to_snapshot       = true
-  allow_major_version_upgrade = false
-  publicly_accessible         = false
-  backup_retention_period     = var.identity.environment == "prod" ? 35 : 7
+
   default-tags = {
     Project          = var.identity.project
     Environment      = var.identity.environment
@@ -27,6 +19,10 @@ locals {
   name                          = "${var.identity.project}-${var.context}-${var.identity.environment}"
   sg_gr_name                    = "${var.identity.project}-${var.context}-rds-traffic-${var.identity.environment}"
   enhanced_monitoring_role_name = "${var.identity.project}-${var.context}-rds-enhanced-monitring-${var.identity.environment}"
+  enhanced_monitoring_role_arn = var.enhanced_monitoring.self_create ? join("", aws_iam_role.rds_enhanced_monitoring.*.arn) : var.enhanced_monitoring.external_role_arn
+  #fixed params - not allowed to be changed
+  storage_encrypted           = true
+  publicly_accessible         = false
 }
 
 # Ref. https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#genref-aws-service-namespaces
@@ -34,14 +30,14 @@ data "aws_partition" "current" {}
 
 # Random string to use as master password
 resource "random_password" "master_password" {
-  count = var.create_cluster ? 1 : 0
+  count = var.enabled ? 1 : 0
 
   length  = var.random_password_length
   special = false
 }
 
 resource "random_id" "snapshot_identifier" {
-  count = var.create_cluster ? 1 : 0
+  count = var.enabled ? 1 : 0
   keepers = {
     id = local.name
   }
@@ -50,7 +46,7 @@ resource "random_id" "snapshot_identifier" {
 }
 
 resource "aws_db_subnet_group" "this" {
-  count = var.create_cluster && var.create_db_subnet_group ? 1 : 0
+  count = var.enabled && var.create_db_subnet_group ? 1 : 0
 
   name        = local.internal_db_subnet_group_name
   description = "For Aurora cluster ${local.name}"
@@ -60,22 +56,22 @@ resource "aws_db_subnet_group" "this" {
 }
 
 resource "aws_rds_cluster" "this" {
-  count = var.create_cluster ? 1 : 0
+  count = var.enabled ? 1 : 0
 
-  cluster_identifier = local.name
+  cluster_identifier = local.name # max 63 character
 
   engine                              = var.engine
   engine_mode                         = var.engine_mode
   engine_version                      = var.engine_version
-  allow_major_version_upgrade         = local.allow_major_version_upgrade
+  allow_major_version_upgrade         = var.allow_major_version_upgrade
   kms_key_id                          = var.kms_key_id
   database_name                       = var.default_database_name
   master_username                     = var.master_username
   master_password                     = random_password.master_password[count.index].result
   final_snapshot_identifier           = "${local.name}-${element(concat(random_id.snapshot_identifier.*.hex, [""]), 0)}"
-  skip_final_snapshot                 = local.skip_final_snapshot
-  deletion_protection                 = local.deletion_protection
-  backup_retention_period             = local.backup_retention_period
+  skip_final_snapshot                 = var.skip_final_snapshot
+  deletion_protection                 = var.deletion_protection
+  backup_retention_period             = var.backup_retention_period_days
   preferred_backup_window             = var.preferred_backup_window
   preferred_maintenance_window        = var.preferred_maintenance_window
   port                                = local.port
@@ -88,7 +84,7 @@ resource "aws_rds_cluster" "this" {
   db_instance_parameter_group_name    = var.db_cluster_db_instance_parameter_group_name
   iam_database_authentication_enabled = var.iam_database_authentication_enabled
   backtrack_window                    = local.backtrack_window
-  copy_tags_to_snapshot               = local.copy_tags_to_snapshot
+  copy_tags_to_snapshot               = var.copy_tags_to_snapshot
 
   lifecycle {
     ignore_changes = [
@@ -104,7 +100,7 @@ resource "aws_rds_cluster" "this" {
 }
 
 resource "aws_rds_cluster_instance" "this" {
-  count = var.create_cluster ? var.instances_count : 0
+  count = var.enabled ? var.instances_count : 0
 
   # Notes:
   # Do not set preferred_backup_window - its set at the cluster level and will error if provided here
@@ -118,14 +114,14 @@ resource "aws_rds_cluster_instance" "this" {
   db_subnet_group_name                  = local.db_subnet_group_name
   db_parameter_group_name               = var.db_parameter_group_name
   apply_immediately                     = var.apply_immediately
-  monitoring_role_arn                   = local.rds_enhanced_monitoring_arn
+  monitoring_role_arn                   = local.enhanced_monitoring_role_arn
   monitoring_interval                   = var.monitoring_interval_seconds
   preferred_maintenance_window          = var.preferred_maintenance_window
   auto_minor_version_upgrade            = var.auto_minor_version_upgrade
   performance_insights_enabled          = var.performance_insights_enabled
   performance_insights_kms_key_id       = var.performance_insights_kms_key_id
-  performance_insights_retention_period = var.performance_insights_retention_period
-  copy_tags_to_snapshot                 = local.copy_tags_to_snapshot
+  performance_insights_retention_period = var.performance_insights_retention_period_days
+  copy_tags_to_snapshot                 = var.copy_tags_to_snapshot
   ca_cert_identifier                    = var.ca_cert_identifier
 
   tags = local.tags
@@ -133,7 +129,7 @@ resource "aws_rds_cluster_instance" "this" {
 
 
 resource "aws_rds_cluster_role_association" "this" {
-  for_each = var.create_cluster ? var.iam_roles : {}
+  for_each = var.enabled ? var.iam_roles : {}
 
   db_cluster_identifier = try(aws_rds_cluster.this[0].id, "")
   feature_name          = each.value.feature_name
@@ -156,7 +152,7 @@ data "aws_iam_policy_document" "monitoring_rds_assume_role" {
 }
 
 resource "aws_iam_role" "rds_enhanced_monitoring" {
-  count = var.create_cluster && var.create_monitoring_role && var.monitoring_interval_seconds > 0 ? 1 : 0
+  count = var.enabled && var.enhanced_monitoring.self_create && var.monitoring_interval_seconds > 0 ? 1 : 0
 
   name        = local.enhanced_monitoring_role_name
   description = "Enhanced monitoing Role for RDS Aurora ${local.name}"
@@ -166,7 +162,7 @@ resource "aws_iam_role" "rds_enhanced_monitoring" {
 }
 
 resource "aws_iam_role_policy_attachment" "rds_enhanced_monitoring" {
-  count = var.create_cluster && var.create_monitoring_role && var.monitoring_interval_seconds > 0 ? 1 : 0
+  count = var.enabled && var.enhanced_monitoring.self_create && var.monitoring_interval_seconds > 0 ? 1 : 0
 
   role       = aws_iam_role.rds_enhanced_monitoring[0].name
   policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
@@ -177,7 +173,7 @@ resource "aws_iam_role_policy_attachment" "rds_enhanced_monitoring" {
 ################################################################################
 
 resource "aws_security_group" "this" {
-  count = var.create_cluster ? 1 : 0
+  count = var.enabled ? 1 : 0
 
   name        = local.sg_gr_name
   vpc_id      = var.vpc_id
@@ -234,41 +230,41 @@ resource "aws_security_group" "this" {
 
 
 resource "aws_ssm_parameter" "endpoint_writer" {
-  count = var.create_cluster ? 1 : 0
+  count = var.enabled ? 1 : 0
   name  = "/rds/${local.name}/db_writer_endpoint"
   type  = "String"
   value = aws_rds_cluster.this[count.index].endpoint
 }
 resource "aws_ssm_parameter" "endpoint_reader" {
-  count = var.create_cluster ? 1 : 0
+  count = var.enabled ? 1 : 0
   name  = "/rds/${local.name}/db_reader_endpoint"
   type  = "String"
   value = aws_rds_cluster.this[count.index].reader_endpoint
 }
 
 resource "aws_ssm_parameter" "port" {
-  count = var.create_cluster ? 1 : 0
+  count = var.enabled ? 1 : 0
   name  = "/rds/${local.name}/db_port"
   type  = "String"
   value = local.port
 }
 
 resource "aws_ssm_parameter" "database" {
-  count = var.create_cluster ? 1 : 0
+  count = var.enabled ? 1 : 0
   name  = "/rds/${local.name}/db_default_database"
   type  = "String"
   value = var.default_database_name
 }
 
 resource "aws_ssm_parameter" "username" {
-  count = var.create_cluster ? 1 : 0
+  count = var.enabled ? 1 : 0
   name  = "/rds/${local.name}/db_master_username"
   type  = "SecureString"
   value = var.master_username
 }
 
 resource "aws_ssm_parameter" "password" {
-  count = var.create_cluster ? 1 : 0
+  count = var.enabled ? 1 : 0
   name  = "/rds/${local.name}/db_master_password"
   type  = "SecureString"
   value = random_password.master_password[count.index].result
