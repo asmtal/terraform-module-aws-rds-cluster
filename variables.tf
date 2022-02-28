@@ -7,8 +7,8 @@ environment - Name of environment. Possible values: dev[1-9]+, test[1-9]+, qa[1-
 project_repo - Name of project repository which uses this module.
 EOT
   type = object({
-    project     = string
-    environment = string
+    project      = string
+    environment  = string
     project_repo = string
   })
   validation {
