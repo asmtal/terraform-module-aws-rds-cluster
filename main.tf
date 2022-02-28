@@ -1,10 +1,12 @@
 locals {
-  port = coalesce(var.port, (var.engine == "aurora-postgresql" ? 5432 : 3306))
+  module_name = "terraform-module-rds-cluster"
+  port        = coalesce(var.port, (var.engine == "aurora-postgresql" ? 5432 : 3306))
 
   db_subnet_group_name          = var.create_db_subnet_group ? join("", aws_db_subnet_group.this.*.name) : var.db_subnet_group_name
   internal_db_subnet_group_name = try(coalesce(var.db_subnet_group_name, local.name), "")
   backtrack_window              = var.engine == "aurora-mysql" || var.engine == "aurora" ? var.backtrack_window : 0
 
+<<<<<<< Updated upstream
   rds_enhanced_monitoring_arn = var.create_monitoring_role ? join("", aws_iam_role.rds_enhanced_monitoring.*.arn) : var.monitoring_role_arn
   rds_security_group_id       = join("", aws_security_group.this.*.id)
   #fixed params - not allowed to be changed
@@ -27,6 +29,24 @@ locals {
   name                          = "${var.identity.project}-${var.context}-${var.identity.environment}"
   sg_gr_name                    = "${var.identity.project}-${var.context}-rds-traffic-${var.identity.environment}"
   enhanced_monitoring_role_name = "${var.identity.project}-${var.context}-rds-enhanced-monitring-${var.identity.environment}"
+=======
+  rds_security_group_id = join("", aws_security_group.this.*.id)
+  possible_environment_values = flatten([for env_name in ["dev", "test", "qa", "green", "blue", "stage", "uat", "prod"]: [for num in [1,2,3,4,5,6,7,8,9]: "${env_name}${num}"]])
+
+  tags                            = merge({
+    TerraformModule = local.module_name
+  }, var.tags)
+  #resources names
+  name                            = "${var.identity.project}-${var.context}-${var.identity.environment}"
+  sg_gr_name                      = "${var.identity.project}-${var.context}-rds-traffic-${var.identity.environment}"
+  #enhanced monitoring
+  enhanced_monitoring_role_name   = "${var.identity.project}-${var.context}-rds-enhanced-monitring-${var.identity.environment}"
+  create_enhanced_monitoring_role = var.enhanced_monitoring_enabled && var.enhanced_monitoring_external_role_arn == null
+  enhanced_monitoring_role_arn    = var.enhanced_monitoring_external_role_arn == null ? join("", aws_iam_role.rds_enhanced_monitoring.*.arn) : var.enhanced_monitoring_external_role_arn
+  #fixed params - not allowed to be changed
+  storage_encrypted               = true
+  publicly_accessible             = false
+>>>>>>> Stashed changes
 }
 
 # Ref. https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#genref-aws-service-namespaces
@@ -41,7 +61,11 @@ resource "random_password" "master_password" {
 }
 
 resource "random_id" "snapshot_identifier" {
+<<<<<<< Updated upstream
   count = var.create_cluster ? 1 : 0
+=======
+  count   = var.enabled ? 1 : 0
+>>>>>>> Stashed changes
   keepers = {
     id = local.name
   }
@@ -118,8 +142,13 @@ resource "aws_rds_cluster_instance" "this" {
   db_subnet_group_name                  = local.db_subnet_group_name
   db_parameter_group_name               = var.db_parameter_group_name
   apply_immediately                     = var.apply_immediately
+<<<<<<< Updated upstream
   monitoring_role_arn                   = local.rds_enhanced_monitoring_arn
   monitoring_interval                   = var.monitoring_interval_seconds
+=======
+  monitoring_role_arn                   = local.enhanced_monitoring_role_arn
+  monitoring_interval                   = var.enhanced_monitoring_interval_seconds
+>>>>>>> Stashed changes
   preferred_maintenance_window          = var.preferred_maintenance_window
   auto_minor_version_upgrade            = var.auto_minor_version_upgrade
   performance_insights_enabled          = var.performance_insights_enabled
@@ -156,17 +185,28 @@ data "aws_iam_policy_document" "monitoring_rds_assume_role" {
 }
 
 resource "aws_iam_role" "rds_enhanced_monitoring" {
+<<<<<<< Updated upstream
   count = var.create_cluster && var.create_monitoring_role && var.monitoring_interval_seconds > 0 ? 1 : 0
 
   name        = local.enhanced_monitoring_role_name
   description = "Enhanced monitoing Role for RDS Aurora ${local.name}"
+=======
+  count = var.enabled && local.create_enhanced_monitoring_role ? 1 : 0
+>>>>>>> Stashed changes
 
-  tags               = local.tags
+  name               = local.enhanced_monitoring_role_name
+  description        = "Enhanced monitoing Role for RDS Aurora ${local.name}"
   assume_role_policy = data.aws_iam_policy_document.monitoring_rds_assume_role.json
+
+  tags = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "rds_enhanced_monitoring" {
+<<<<<<< Updated upstream
   count = var.create_cluster && var.create_monitoring_role && var.monitoring_interval_seconds > 0 ? 1 : 0
+=======
+  count = var.enabled && local.create_enhanced_monitoring_role ? 1 : 0
+>>>>>>> Stashed changes
 
   role       = aws_iam_role.rds_enhanced_monitoring[0].name
   policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
@@ -183,7 +223,7 @@ resource "aws_security_group" "this" {
   vpc_id      = var.vpc_id
   description = "Control traffic to/from RDS Aurora ${local.name}"
 
-  tags = merge(local.tags, { Name = local.sg_gr_name })
+  tags = merge( { Name = local.sg_gr_name }, local.tags)
 }
 #
 ## TODO - change to map of ingress rules under one resource at next breaking change

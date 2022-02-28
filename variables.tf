@@ -1,18 +1,32 @@
+
 variable "identity" {
+  description = <<-EOT
+Unique project identity objecty. Containts:
+project -
+EOT
   type = object({
-    project     = string,
+    project     = string
     environment = string
     source_repo = string
   })
   validation {
+<<<<<<< Updated upstream
     condition     = contains(["prod", "green", "blue", "stage", "uat", "qa", "test", "dev"], var.identity.environment) && length(var.identity.project) >= 2 && length(var.identity.project) <= 4
     error_message = "Allowed values for environment are \"prod\", \"green\", \"blue\", \"stage\", \"uat\", \"qa\", \"test\", or \"dev\". Project variable length must be between 2 and 4 characters."
+=======
+    condition = contains(flatten([for env_name in ["dev", "test", "qa", "green", "blue", "stage", "uat", "prod"]: [for num in ["","1","2","3","4","5","6","7","8","9"]: "${env_name}${num}"]]), var.identity.environment) && length(var.identity.project) >= 2 && length(var.identity.project) <= 10
+    error_message = "Invalid value for environment or Project variable length must be between 2 and 10 characters."
+>>>>>>> Stashed changes
   }
 }
 
 variable "context" {
   type        = string
+<<<<<<< Updated upstream
   description = "Optional context of module usage. Max 10 characters. E.g. `backend`, `frontend` etc."
+=======
+  description = "Context of module usage. Will be used as name/id in all created resources. Max 10 characters. E.g. `backend`, `frontend` etc."
+>>>>>>> Stashed changes
   validation {
     condition     = length(var.context) >= 2 && length(var.context) <= 10
     error_message = "The `context` variable length must be between 2 and 10 characters."
@@ -22,8 +36,13 @@ variable "context" {
 
 
 # aws_rds_cluster
+<<<<<<< Updated upstream
 variable "create_cluster" {
   description = "Whether cluster should be created (affects nearly all resources)"
+=======
+variable "enabled" {
+  description = "Indicates whether all resources inside module should be created (affects nearly all resources)"
+>>>>>>> Stashed changes
   type        = bool
   default     = true
 }
@@ -60,6 +79,7 @@ variable "engine_mode" {
   }
 }
 
+<<<<<<< Updated upstream
 # Enhanced monitoring role
 variable "create_monitoring_role" {
   description = "Determines whether to create the IAM role for RDS enhanced monitoring."
@@ -71,7 +91,27 @@ variable "monitoring_role_arn" {
   description = "IAM role used by RDS to send enhanced monitoring metrics to CloudWatch."
   type        = string
   default     = ""
+=======
+# Enhanced monitoring
+variable "enhanced_monitoring_enabled" {
+  description = "Flag indicates whether RDS enhanced monitoring role is enabled. By default enhanced motoring is turned on."
+  type        = bool
+  default     = true
 }
+variable "enhanced_monitoring_external_role_arn" {
+  description = "ARN of external IAM role for RDS enhanced monitoring. When 'enhanced_monitoring_external_role_arn' is null. IAM role is created internally in module. Defaults to null."
+  type        = string
+  default     = null
+>>>>>>> Stashed changes
+}
+variable "enhanced_monitoring_interval_seconds" {
+  description = "The interval, in seconds, between points when Enhanced Monitoring metrics are collected for instances. Default is `60`"
+  type        = number
+  default     = 60
+}
+
+# RDS security group configuration
+
 
 variable "backtrack_window" {
   description = "The target backtrack window, in seconds. Only available for `aurora` engine currently. To disable backtracking, set this value to 0. Must be between 0 and 259200 (72 hours)"
@@ -128,21 +168,14 @@ variable "subnets" {
   type        = list(string)
 }
 
-variable "extra-tags" {
+variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)
-  default     = {}
 }
 
 variable "instance_class" {
   description = "Instance type to use at master instance. Note: if `autoscaling_enabled` is `true`, this will be the same instance class used on instances created by autoscaling"
   type        = string
-}
-# aws_appautoscaling_*
-variable "autoscaling_enabled" {
-  description = "Determines whether autoscaling of the cluster read replicas is enabled"
-  type        = bool
-  default     = false
 }
 
 variable "kms_key_id" {
@@ -172,12 +205,6 @@ variable "preferred_maintenance_window" {
   description = "The weekly time range during which system maintenance can occur, in (UTC)"
   type        = string
   default     = "sun:05:00-sun:06:00"
-}
-
-variable "monitoring_interval_seconds" {
-  description = "The interval, in seconds, between points when Enhanced Monitoring metrics are collected for instances. Set to `0` to disble. Default is `0`"
-  type        = number
-  default     = 0
 }
 
 variable "vpc_id" {
