@@ -35,7 +35,7 @@ variable "enabled" {
   default     = true
 }
 variable "port" {
-  description = "The port on which the DB accepts connections. Defaults to aurora-postgres port `5432`"
+  description = "The port on which the DB accepts connections. Defaults to aurora-postgres port `5432`."
   type        = string
   default     = "5432"
 }
