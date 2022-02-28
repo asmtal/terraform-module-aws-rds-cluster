@@ -9,7 +9,6 @@ repos:
           - '--args=--lockfile=false'
       - id: terraform_tflint
         args:
-          - --args=--deep
           - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.1.0
