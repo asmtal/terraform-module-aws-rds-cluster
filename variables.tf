@@ -78,7 +78,7 @@ variable "enhanced_monitoring_external_role_arn" {
   default     = null
 }
 variable "enhanced_monitoring_interval_seconds" {
-  description = "The interval, in seconds, between points when Enhanced Monitoring metrics are collected for instances. Default is `60`"
+  description = "The interval, in seconds, between points when Enhanced Monitoring metrics are collected for instances. Default is `60`."
   type        = number
   default     = 60
 }
