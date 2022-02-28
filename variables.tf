@@ -51,7 +51,7 @@ variable "engine" {
 }
 
 variable "random_password_length" {
-  description = "Length of random password to create. Defaults to `10`"
+  description = "Length of random password to create. Defaults to `10`."
   type        = number
   default     = 10
 }
