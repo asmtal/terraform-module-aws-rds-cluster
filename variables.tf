@@ -12,8 +12,8 @@ EOT
     project_repo = string
   })
   validation {
-    condition     = contains(flatten([for env_name in ["dev", "test", "qa", "green", "blue", "stage", "uat", "prod"] : [for num in ["", "1", "2", "3", "4", "5", "6", "7", "8", "9"] : "${env_name}${num}"]]), var.identity.environment) && length(var.identity.project) >= 2 && length(var.identity.project) <= 10
-    error_message = "Invalid value for environment or Project variable length must be between 2 and 10 characters."
+    condition     = contains(flatten([for env_name in ["dev", "test", "qa", "green", "blue", "stage", "uat", "prod"] : [for num in ["", "1", "2", "3", "4", "5", "6", "7", "8", "9"] : "${env_name}${num}"]]), var.identity.environment) && length(var.identity.project) >= 2 && length(var.identity.project) <= 10 && var.identity.project_repo != null
+    error_message = "Value of 'environment' must be one of allowed values. Length of Variable 'project' must be between 2 and 10 characters. Value of 'project_repo' variable must not be null."
   }
 }
 
