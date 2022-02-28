@@ -30,7 +30,7 @@ variable "context" {
 
 # aws_rds_cluster
 variable "enabled" {
-  description = "Indicates whether all resources inside module should be created (affects nearly all resources)"
+  description = "Indicates whether all resources inside module should be created (affects nearly all resources)."
   type        = bool
   default     = true
 }
