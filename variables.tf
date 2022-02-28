@@ -2,12 +2,14 @@
 variable "identity" {
   description = <<-EOT
 Unique project identity objecty. Containts:
-project -
+project - Unique project identifier across entire organization.
+environment - Name of environment. Possible values: dev[1-9]+, test[1-9]+, qa[1-9]+, green[1-9]+, blue[1-9]+, stage[1-9]+, uat[1-9]+, prod[1-9]+.
+project_repo - Name of project repository which uses this module.
 EOT
   type = object({
     project     = string
     environment = string
-    source_repo = string
+    project_repo = string
   })
   validation {
     condition     = contains(flatten([for env_name in ["dev", "test", "qa", "green", "blue", "stage", "uat", "prod"] : [for num in ["", "1", "2", "3", "4", "5", "6", "7", "8", "9"] : "${env_name}${num}"]]), var.identity.environment) && length(var.identity.project) >= 2 && length(var.identity.project) <= 10
