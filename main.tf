@@ -233,12 +233,14 @@ resource "aws_ssm_parameter" "endpoint_writer" {
   name  = "/rds/${local.name}/db_writer_endpoint"
   type  = "String"
   value = aws_rds_cluster.this[count.index].endpoint
+  tags = local.tags
 }
 resource "aws_ssm_parameter" "endpoint_reader" {
   count = var.enabled ? 1 : 0
   name  = "/rds/${local.name}/db_reader_endpoint"
   type  = "String"
   value = aws_rds_cluster.this[count.index].reader_endpoint
+  tags = local.tags
 }
 
 resource "aws_ssm_parameter" "port" {
@@ -246,6 +248,7 @@ resource "aws_ssm_parameter" "port" {
   name  = "/rds/${local.name}/db_port"
   type  = "String"
   value = local.port
+  tags = local.tags
 }
 
 resource "aws_ssm_parameter" "database" {
@@ -253,6 +256,7 @@ resource "aws_ssm_parameter" "database" {
   name  = "/rds/${local.name}/db_default_database"
   type  = "String"
   value = var.default_database_name
+  tags = local.tags
 }
 
 resource "aws_ssm_parameter" "username" {
@@ -260,6 +264,7 @@ resource "aws_ssm_parameter" "username" {
   name  = "/rds/${local.name}/db_master_username"
   type  = "SecureString"
   value = var.master_username
+  tags = local.tags
 }
 
 resource "aws_ssm_parameter" "password" {
@@ -267,4 +272,5 @@ resource "aws_ssm_parameter" "password" {
   name  = "/rds/${local.name}/db_master_password"
   type  = "SecureString"
   value = random_password.master_password[count.index].result
+  tags = local.tags
 }
