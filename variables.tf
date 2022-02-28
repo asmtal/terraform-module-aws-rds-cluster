@@ -208,7 +208,7 @@ variable "preferred_maintenance_window" {
 }
 
 variable "vpc_id" {
-  description = "ID of the VPC where to security group is created"
+  description = "ID of the VPC where to security group is created."
   type        = string
 }
 
