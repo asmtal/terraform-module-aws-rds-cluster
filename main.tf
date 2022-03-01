@@ -253,7 +253,5 @@ resource "aws_secretsmanager_secret_version" "rds_credentials_secret_version" {
     password        = random_password.master_password[count.index].result
     database_name   = var.default_database_name
     port            = local.port
-    reader_endpoint = aws_rds_cluster.this[count.index].reader_endpoint
-    writer_endpoint = aws_rds_cluster.this[count.index].endpoint
   })
 }
