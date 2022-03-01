@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.0](https://github.com/ck-ev-test/terraform-module-rds-cluster/compare/v1.3.2...v1.4.0) (2022-03-01)
+
+
+### Features
+
+* input variables refactor + generated docs before release ([57d7be9](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/57d7be993f783fb2dbe396d177636450d1002c85))
+
+
+### Bug Fixes
+
+* add tflint tags validation ([c068597](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/c068597a41d7a96de457d3c449e4432393e49e30))
+* dot ([9a7c8b2](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/9a7c8b2accc2ac2ae9fbcd08272a26ab1887e430))
+* dot ([a3f9bed](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/a3f9bed80da65fac32ad2abd58a9e7dc8b39c02a))
+* dot ([2bf82e5](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/2bf82e58e12736b13c4d946a9a86c7af526a6906))
+* dot2 ([a5ef92f](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/a5ef92f0a7e864c6488438ea1d17827588312052))
+* dot3 ([da6ecba](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/da6ecbac9896edf8cf856c89b7ad03d6c04e2e58))
+* fix ([64a9100](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/64a9100cffbccfdbd5206fe1880104a2028101ca))
+* force ([8129a25](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/8129a252aeaa7a51bdda665efb603896951429bf))
+* generate terraform docs ([ae595ce](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/ae595cecc776b267566f719ce33c42dff4f76199))
+* lint ([d0be1f6](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/d0be1f6118d8f37e5cdece91c649cd755bb1bbeb))
+* pre-commit ([fbd3696](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/fbd36960eeb268d80cefb0205cf4f7b036760338))
+* rm deep ([69b65b4](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/69b65b454de610de64826bb2d622bfb78238f3e8))
+* rm docs gen from release ([ed808a1](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/ed808a1d779e8deec541a4ce64b38a28186a025d))
+* setup secret manager ([21f119a](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/21f119a67948268a46e8929afeac184ef26bc6d4))
+* setup secret manager (2) ([5c0ef19](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/5c0ef19cf69bbf614c59cf5c8e26a3625a58a3cb))
+* setup secret manager (3) ([17e8fe4](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/17e8fe410cfe5ff3605849dcb85796721ad206b2))
+* update docs ([be23946](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/be23946a51e41ac1ece4773ef1737a6609a4fcdc))
+* update docs ([318ee43](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/318ee436a2b07bb24260ac5d13672826ec28721d))
+* validate TerraformModule tag for all resources ([9c2b500](https://github.com/ck-ev-test/terraform-module-rds-cluster/commit/9c2b500fa552014bd98f9f03696dd4f08f9239aa))
+
 ### [1.3.2](https://github.com/ck-ev-test/terraform-module-rds-cluster/compare/v1.3.1...v1.3.2) (2022-02-23)
 
 
