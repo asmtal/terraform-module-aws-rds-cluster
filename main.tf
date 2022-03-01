@@ -7,33 +7,33 @@ locals {
   backtrack_window              = var.engine == "aurora-mysql" || var.engine == "aurora" ? var.backtrack_window : 0
 
   rds_security_group_id = join("", aws_security_group.this.*.id)
-  possible_environment_values = flatten([
-    for env_name in [
-      "dev", "test", "qa", "green", "blue", "stage", "uat", "prod"
-    ] : [for num in [1, 2, 3, 4, 5, 6, 7, 8, 9] : "${env_name}${num}"]
-  ])
 
   tags = merge({
     TerraformModule = local.module_name
   }, var.tags)
   #resources names
   name        = "${var.identity.project}-${var.context}-${var.identity.environment}"
-  secret_name = "${var.identity.project}-${var.context}-rds-credentails-${var.identity.environment}"
+  secret_name = "${var.identity.project}-${var.context}-rds-credentials-${var.identity.environment}"
   sg_gr_name  = "${var.identity.project}-${var.context}-rds-traffic-${var.identity.environment}"
-  #enhanced monitoring
+
+  # enhanced monitoring start
   enhanced_monitoring_role_name   = "${var.identity.project}-${var.context}-rds-enhanced-monitring-${var.identity.environment}"
   create_enhanced_monitoring_role = var.enhanced_monitoring_enabled && var.enhanced_monitoring_external_role_arn == null
-  enhanced_monitoring_role_arn    = var.enhanced_monitoring_external_role_arn == null ? join("", aws_iam_role.rds_enhanced_monitoring.*.arn) : var.enhanced_monitoring_external_role_arn
-  #fixed params - not allowed to be changed
+  enhanced_monitoring_role_arn    = local.create_enhanced_monitoring_role ? join("", aws_iam_role.rds_enhanced_monitoring.*.arn) : var.enhanced_monitoring_external_role_arn
+  # enhanced monitoring end
+
+  # use default aws key for rds if kms_key_arn is not passed
+  kms_key_arn = var.kms_key_arn == null ? data.aws_kms_key.aws_rds.arn : var.kms_key_arn
+
+  # fixed params start - not allowed to be changed
   storage_encrypted   = true
   publicly_accessible = false
-
-  db_credentials_secret_json = {
-    username = "dbadmin"
-    password = "dbadmin#02avia"
-  }
+  # fixed params end - not allowed to be changed
 }
-
+# default rds kms key
+data "aws_kms_key" "aws_rds" {
+  key_id = "alias/aws/rds"
+}
 # Ref. https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#genref-aws-service-namespaces
 data "aws_partition" "current" {}
 
@@ -73,7 +73,7 @@ resource "aws_rds_cluster" "this" {
   engine_mode                         = var.engine_mode
   engine_version                      = var.engine_version
   allow_major_version_upgrade         = var.allow_major_version_upgrade
-  kms_key_id                          = var.kms_key_id
+  kms_key_id                          = local.kms_key_arn
   database_name                       = var.default_database_name
   master_username                     = jsondecode(aws_secretsmanager_secret_version.rds_credentials_secret_version[count.index].secret_string)["username"]
   master_password                     = jsondecode(aws_secretsmanager_secret_version.rds_credentials_secret_version[count.index].secret_string)["password"]
@@ -242,7 +242,6 @@ resource "aws_secretsmanager_secret" "rds_credentials_secret" {
   count       = var.enabled ? 1 : 0
   name        = local.secret_name
   description = "Database credentails for RDS Aurora ${local.name}"
-  kms_key_id  = var.kms_key_id
   tags        = local.tags
 }
 resource "aws_secretsmanager_secret_version" "rds_credentials_secret_version" {
@@ -255,3 +254,4 @@ resource "aws_secretsmanager_secret_version" "rds_credentials_secret_version" {
     port     = local.port
   })
 }
+# TODO implement secret rotation
