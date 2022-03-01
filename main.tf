@@ -6,15 +6,20 @@ locals {
   internal_db_subnet_group_name = try(coalesce(var.db_subnet_group_name, local.name), "")
   backtrack_window              = var.engine == "aurora-mysql" || var.engine == "aurora" ? var.backtrack_window : 0
 
-  rds_security_group_id       = join("", aws_security_group.this.*.id)
-  possible_environment_values = flatten([for env_name in ["dev", "test", "qa", "green", "blue", "stage", "uat", "prod"] : [for num in [1, 2, 3, 4, 5, 6, 7, 8, 9] : "${env_name}${num}"]])
+  rds_security_group_id = join("", aws_security_group.this.*.id)
+  possible_environment_values = flatten([
+    for env_name in [
+      "dev", "test", "qa", "green", "blue", "stage", "uat", "prod"
+    ] : [for num in [1, 2, 3, 4, 5, 6, 7, 8, 9] : "${env_name}${num}"]
+  ])
 
   tags = merge({
     TerraformModule = local.module_name
   }, var.tags)
   #resources names
-  name       = "${var.identity.project}-${var.context}-${var.identity.environment}"
-  sg_gr_name = "${var.identity.project}-${var.context}-rds-traffic-${var.identity.environment}"
+  name        = "${var.identity.project}-${var.context}-${var.identity.environment}"
+  secret_name = "${var.identity.project}-${var.context}-rds-credentails-${var.identity.environment}"
+  sg_gr_name  = "${var.identity.project}-${var.context}-rds-traffic-${var.identity.environment}"
   #enhanced monitoring
   enhanced_monitoring_role_name   = "${var.identity.project}-${var.context}-rds-enhanced-monitring-${var.identity.environment}"
   create_enhanced_monitoring_role = var.enhanced_monitoring_enabled && var.enhanced_monitoring_external_role_arn == null
@@ -22,6 +27,11 @@ locals {
   #fixed params - not allowed to be changed
   storage_encrypted   = true
   publicly_accessible = false
+
+  db_credentials_secret_json = {
+    username = "dbadmin"
+    password = "dbadmin#02avia"
+  }
 }
 
 # Ref. https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#genref-aws-service-namespaces
@@ -65,8 +75,8 @@ resource "aws_rds_cluster" "this" {
   allow_major_version_upgrade         = var.allow_major_version_upgrade
   kms_key_id                          = var.kms_key_id
   database_name                       = var.default_database_name
-  master_username                     = var.master_username
-  master_password                     = random_password.master_password[count.index].result
+  master_username                     = jsondecode(aws_secretsmanager_secret_version.rds_credentials_secret_version[count.index].secret_string)["username"]
+  master_password                     = jsondecode(aws_secretsmanager_secret_version.rds_credentials_secret_version[count.index].secret_string)["password"]
   final_snapshot_identifier           = "${local.name}-${element(concat(random_id.snapshot_identifier.*.hex, [""]), 0)}"
   skip_final_snapshot                 = var.skip_final_snapshot
   deletion_protection                 = var.deletion_protection
@@ -228,49 +238,22 @@ resource "aws_security_group" "this" {
 #}
 
 
-resource "aws_ssm_parameter" "endpoint_writer" {
-  count = var.enabled ? 1 : 0
-  name  = "/rds/${local.name}/db_writer_endpoint"
-  type  = "String"
-  value = aws_rds_cluster.this[count.index].endpoint
-  tags  = local.tags
+resource "aws_secretsmanager_secret" "rds_credentials_secret" {
+  count       = var.enabled ? 1 : 0
+  name        = local.secret_name
+  description = "Database credentails for RDS Aurora ${local.name}"
+  kms_key_id  = var.kms_key_id
+  tags        = local.tags
 }
-resource "aws_ssm_parameter" "endpoint_reader" {
-  count = var.enabled ? 1 : 0
-  name  = "/rds/${local.name}/db_reader_endpoint"
-  type  = "String"
-  value = aws_rds_cluster.this[count.index].reader_endpoint
-  tags  = local.tags
-}
-
-resource "aws_ssm_parameter" "port" {
-  count = var.enabled ? 1 : 0
-  name  = "/rds/${local.name}/db_port"
-  type  = "String"
-  value = local.port
-  tags  = local.tags
-}
-
-resource "aws_ssm_parameter" "database" {
-  count = var.enabled ? 1 : 0
-  name  = "/rds/${local.name}/db_default_database"
-  type  = "String"
-  value = var.default_database_name
-  tags  = local.tags
-}
-
-resource "aws_ssm_parameter" "username" {
-  count = var.enabled ? 1 : 0
-  name  = "/rds/${local.name}/db_master_username"
-  type  = "SecureString"
-  value = var.master_username
-  tags  = local.tags
-}
-
-resource "aws_ssm_parameter" "password" {
-  count = var.enabled ? 1 : 0
-  name  = "/rds/${local.name}/db_master_password"
-  type  = "SecureString"
-  value = random_password.master_password[count.index].result
-  tags  = local.tags
+resource "aws_secretsmanager_secret_version" "rds_credentials_secret_version" {
+  count     = var.enabled ? 1 : 0
+  secret_id = aws_secretsmanager_secret.rds_credentials_secret[count.index].id
+  secret_string = jsonencode({
+    username        = var.master_username
+    password        = random_password.master_password[count.index].result
+    database_name   = var.default_database_name
+    port            = local.port
+    reader_endpoint = aws_rds_cluster.this[count.index].reader_endpoint
+    writer_endpoint = aws_rds_cluster.this[count.index].endpoint
+  })
 }
