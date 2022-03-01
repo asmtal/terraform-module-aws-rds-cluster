@@ -249,9 +249,9 @@ resource "aws_secretsmanager_secret_version" "rds_credentials_secret_version" {
   count     = var.enabled ? 1 : 0
   secret_id = aws_secretsmanager_secret.rds_credentials_secret[count.index].id
   secret_string = jsonencode({
-    username        = var.master_username
-    password        = random_password.master_password[count.index].result
-    database_name   = var.default_database_name
-    port            = local.port
+    username = var.master_username
+    password = random_password.master_password[count.index].result
+    name     = var.default_database_name
+    port     = local.port
   })
 }
