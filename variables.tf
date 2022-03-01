@@ -2,31 +2,24 @@
 variable "identity" {
   description = <<-EOT
 Unique project identity objecty. Containts:
-project -
+project - Unique project identifier across entire organization.
+environment - Name of environment. Possible values: dev[1-9]+, test[1-9]+, qa[1-9]+, green[1-9]+, blue[1-9]+, stage[1-9]+, uat[1-9]+, prod[1-9]+.
+project_repo - Name of project repository which uses this module.
 EOT
   type = object({
-    project     = string
-    environment = string
-    source_repo = string
+    project      = string
+    environment  = string
+    project_repo = string
   })
   validation {
-<<<<<<< Updated upstream
-    condition     = contains(["prod", "green", "blue", "stage", "uat", "qa", "test", "dev"], var.identity.environment) && length(var.identity.project) >= 2 && length(var.identity.project) <= 4
-    error_message = "Allowed values for environment are \"prod\", \"green\", \"blue\", \"stage\", \"uat\", \"qa\", \"test\", or \"dev\". Project variable length must be between 2 and 4 characters."
-=======
-    condition = contains(flatten([for env_name in ["dev", "test", "qa", "green", "blue", "stage", "uat", "prod"]: [for num in ["","1","2","3","4","5","6","7","8","9"]: "${env_name}${num}"]]), var.identity.environment) && length(var.identity.project) >= 2 && length(var.identity.project) <= 10
-    error_message = "Invalid value for environment or Project variable length must be between 2 and 10 characters."
->>>>>>> Stashed changes
+    condition     = contains(flatten([for env_name in ["dev", "test", "qa", "green", "blue", "stage", "uat", "prod"] : [for num in ["", "1", "2", "3", "4", "5", "6", "7", "8", "9"] : "${env_name}${num}"]]), var.identity.environment) && length(var.identity.project) >= 2 && length(var.identity.project) <= 10 && var.identity.project_repo != null
+    error_message = "Value of 'environment' must be one of allowed values. Length of Variable 'project' must be between 2 and 10 characters. Value of 'project_repo' variable must not be null."
   }
 }
 
 variable "context" {
   type        = string
-<<<<<<< Updated upstream
-  description = "Optional context of module usage. Max 10 characters. E.g. `backend`, `frontend` etc."
-=======
   description = "Context of module usage. Will be used as name/id in all created resources. Max 10 characters. E.g. `backend`, `frontend` etc."
->>>>>>> Stashed changes
   validation {
     condition     = length(var.context) >= 2 && length(var.context) <= 10
     error_message = "The `context` variable length must be between 2 and 10 characters."
@@ -36,24 +29,19 @@ variable "context" {
 
 
 # aws_rds_cluster
-<<<<<<< Updated upstream
-variable "create_cluster" {
-  description = "Whether cluster should be created (affects nearly all resources)"
-=======
 variable "enabled" {
-  description = "Indicates whether all resources inside module should be created (affects nearly all resources)"
->>>>>>> Stashed changes
+  description = "Indicates whether all resources inside module should be created (affects nearly all resources)."
   type        = bool
   default     = true
 }
 variable "port" {
-  description = "The port on which the DB accepts connections. Defaults to aurora-postgres port `5432`"
+  description = "The port on which the DB accepts connections. Defaults to aurora-postgres port `5432`."
   type        = string
   default     = "5432"
 }
 
 variable "engine" {
-  description = "The name of the database engine to be used for this DB cluster. Defaults to `aurora-postgresql`. Valid Values: `aurora`, `aurora-mysql`, `aurora-postgresql`"
+  description = "The name of the database engine to be used for this DB cluster. Defaults to `aurora-postgresql`. Valid Values: `aurora`, `aurora-mysql`, `aurora-postgresql`."
   type        = string
   default     = "aurora-postgresql"
   validation {
@@ -63,7 +51,7 @@ variable "engine" {
 }
 
 variable "random_password_length" {
-  description = "Length of random password to create. Defaults to `10`"
+  description = "Length of random password to create. Defaults to `10`."
   type        = number
   default     = 10
 }
@@ -78,20 +66,6 @@ variable "engine_mode" {
     error_message = "Allowed values for engine_mode are \"global\", \"parallelquery-mysql\", \"provisioned\", or \"multimaster\"."
   }
 }
-
-<<<<<<< Updated upstream
-# Enhanced monitoring role
-variable "create_monitoring_role" {
-  description = "Determines whether to create the IAM role for RDS enhanced monitoring."
-  type        = bool
-  default     = true
-}
-
-variable "monitoring_role_arn" {
-  description = "IAM role used by RDS to send enhanced monitoring metrics to CloudWatch."
-  type        = string
-  default     = ""
-=======
 # Enhanced monitoring
 variable "enhanced_monitoring_enabled" {
   description = "Flag indicates whether RDS enhanced monitoring role is enabled. By default enhanced motoring is turned on."
@@ -102,10 +76,9 @@ variable "enhanced_monitoring_external_role_arn" {
   description = "ARN of external IAM role for RDS enhanced monitoring. When 'enhanced_monitoring_external_role_arn' is null. IAM role is created internally in module. Defaults to null."
   type        = string
   default     = null
->>>>>>> Stashed changes
 }
 variable "enhanced_monitoring_interval_seconds" {
-  description = "The interval, in seconds, between points when Enhanced Monitoring metrics are collected for instances. Default is `60`"
+  description = "The interval, in seconds, between points when Enhanced Monitoring metrics are collected for instances. Default is `60`."
   type        = number
   default     = 60
 }
@@ -263,4 +236,33 @@ variable "db_cluster_db_instance_parameter_group_name" {
   description = "Instance parameter group to associate with all instances of the DB cluster. The `db_cluster_db_instance_parameter_group_name` is only valid in combination with `allow_major_version_upgrade`"
   type        = string
   default     = null
+}
+
+variable "allow_major_version_upgrade" {
+  description = "Enable to allow major engine version upgrades when changing engine versions. Defaults to `false`"
+  type        = bool
+  default     = false
+}
+
+variable "skip_final_snapshot" {
+  description = "Determines whether a final snapshot is created before the cluster is deleted. If true is specified, no snapshot is created"
+  type        = bool
+  default     = null
+}
+
+variable "deletion_protection" {
+  description = "If the DB instance should have deletion protection enabled. The database can't be deleted when this value is set to `true`. The default is `false`"
+  type        = bool
+  default     = null
+}
+
+variable "backup_retention_period" {
+  description = "The days to retain backups for. Default `7`"
+  type        = number
+  default     = 7
+}
+variable "copy_tags_to_snapshot" {
+  description = "Copy all Cluster `tags` to snapshots"
+  type        = bool
+  default     = true
 }

@@ -6,8 +6,12 @@ repos:
       - id: terraform_validate
       - id: terraform_docs
         args:
-          - '--args=--lockfile=false'
+          - --hook-config=--path-to-file=__GIT_WORKING_DIR__/README.md
+          - --hook-config=--add-to-existing-file=true
+          - --hook-config=--create-file-if-not-exist=true
       - id: terraform_tflint
+        args:
+          - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.1.0
     hooks:
