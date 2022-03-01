@@ -41,7 +41,7 @@ variable "port" {
 }
 
 variable "engine" {
-  description = "The name of the database engine to be used for this DB cluster. Defaults to `aurora-postgresql`. Valid Values: `aurora`, `aurora-mysql`, `aurora-postgresql`"
+  description = "The name of the database engine to be used for this DB cluster. Defaults to `aurora-postgresql`. Valid Values: `aurora`, `aurora-mysql`, `aurora-postgresql`."
   type        = string
   default     = "aurora-postgresql"
   validation {

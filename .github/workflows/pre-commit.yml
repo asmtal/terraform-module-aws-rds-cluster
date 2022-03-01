@@ -75,3 +75,4 @@ jobs:
         with:
           terraform-version: ${{ steps.minMax.outputs.maxVersion }}
           terraform-docs-version: ${{ env.TERRAFORM_DOCS_VERSION }}
+          args: "--all-files --color always --show-diff-on-failure"

@@ -6,12 +6,7 @@
 5. [Inputs](#inputs)
 6. [Outputs](#outputs)
 ## Using pre-commit locally
-### local installation guide
 https://github.com/antonbabenko/pre-commit-terraform#how-to-install
-### command
-```
-pre-commit run -a
-```
 
 ## Usage
 *various commands
@@ -73,7 +68,7 @@ No modules.
 | <a name="input_default_database_name"></a> [default\_database\_name](#input\_default\_database\_name) | Name for an automatically created database on cluster creation. Defaults to `default` | `string` | `"default_db"` | no |
 | <a name="input_deletion_protection"></a> [deletion\_protection](#input\_deletion\_protection) | If the DB instance should have deletion protection enabled. The database can't be deleted when this value is set to `true`. The default is `false` | `bool` | `null` | no |
 | <a name="input_enabled"></a> [enabled](#input\_enabled) | Indicates whether all resources inside module should be created (affects nearly all resources). | `bool` | `true` | no |
-| <a name="input_engine"></a> [engine](#input\_engine) | The name of the database engine to be used for this DB cluster. Defaults to `aurora-postgresql`. Valid Values: `aurora`, `aurora-mysql`, `aurora-postgresql` | `string` | `"aurora-postgresql"` | no |
+| <a name="input_engine"></a> [engine](#input\_engine) | The name of the database engine to be used for this DB cluster. Defaults to `aurora-postgresql`. Valid Values: `aurora`, `aurora-mysql`, `aurora-postgresql`. | `string` | `"aurora-postgresql"` | no |
 | <a name="input_engine_mode"></a> [engine\_mode](#input\_engine\_mode) | The database engine mode. Valid values: `global`, `multimaster`, `parallelquery`, `provisioned`. Defaults to: `provisioned`. | `string` | `"provisioned"` | no |
 | <a name="input_engine_version"></a> [engine\_version](#input\_engine\_version) | The database engine version. Updating this argument results in an outage | `string` | `null` | no |
 | <a name="input_enhanced_monitoring_enabled"></a> [enhanced\_monitoring\_enabled](#input\_enhanced\_monitoring\_enabled) | Flag indicates whether RDS enhanced monitoring role is enabled. By default enhanced motoring is turned on. | `bool` | `true` | no |
