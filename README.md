@@ -7,7 +7,10 @@
 6. [Outputs](#outputs)
 ## Using pre-commit locally
 https://github.com/antonbabenko/pre-commit-terraform#how-to-install
-
+### set environment vareiable used in github actions
+`
+set __GIT_WORKING_DIR__=.
+`
 ## Usage
 *various commands
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
@@ -46,6 +49,7 @@ No modules.
 | [random_id.snapshot_identifier](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [random_password.master_password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
 | [aws_iam_policy_document.monitoring_rds_assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_kms_key.aws_rds](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/kms_key) | data source |
 | [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/partition) | data source |
 
 ## Inputs
@@ -74,12 +78,13 @@ No modules.
 | <a name="input_enhanced_monitoring_enabled"></a> [enhanced\_monitoring\_enabled](#input\_enhanced\_monitoring\_enabled) | Flag indicates whether RDS enhanced monitoring role is enabled. By default enhanced motoring is turned on. | `bool` | `true` | no |
 | <a name="input_enhanced_monitoring_external_role_arn"></a> [enhanced\_monitoring\_external\_role\_arn](#input\_enhanced\_monitoring\_external\_role\_arn) | ARN of external IAM role for RDS enhanced monitoring. When 'enhanced\_monitoring\_external\_role\_arn' is null. IAM role is created internally in module. Defaults to null. | `string` | `null` | no |
 | <a name="input_enhanced_monitoring_interval_seconds"></a> [enhanced\_monitoring\_interval\_seconds](#input\_enhanced\_monitoring\_interval\_seconds) | The interval, in seconds, between points when Enhanced Monitoring metrics are collected for instances. Default is `60`. | `number` | `60` | no |
+| <a name="input_external_security_group_arn"></a> [external\_security\_group\_arn](#input\_external\_security\_group\_arn) | ID of the VPC where default security group is created. | `string` | `null` | no |
 | <a name="input_iam_database_authentication_enabled"></a> [iam\_database\_authentication\_enabled](#input\_iam\_database\_authentication\_enabled) | Specifies whether or mappings of AWS Identity and Access Management (IAM) accounts to database accounts is enabled. | `bool` | `null` | no |
 | <a name="input_iam_roles"></a> [iam\_roles](#input\_iam\_roles) | Map of IAM roles and supported feature names to associate with the cluster | `map(map(string))` | `{}` | no |
 | <a name="input_identity"></a> [identity](#input\_identity) | Unique project identity objecty. Containts:<br>project - Unique project identifier across entire organization.<br>environment - Name of environment. Possible values: dev[1-9]+, test[1-9]+, qa[1-9]+, green[1-9]+, blue[1-9]+, stage[1-9]+, uat[1-9]+, prod[1-9]+.<br>project\_repo - Name of project repository which uses this module. | <pre>object({<br>    project      = string<br>    environment  = string<br>    project_repo = string<br>  })</pre> | n/a | yes |
 | <a name="input_instance_class"></a> [instance\_class](#input\_instance\_class) | Instance type to use at master instance. Note: if `autoscaling_enabled` is `true`, this will be the same instance class used on instances created by autoscaling | `string` | n/a | yes |
 | <a name="input_instances_count"></a> [instances\_count](#input\_instances\_count) | Indicates the number of db instances. Default `2` | `number` | `2` | no |
-| <a name="input_kms_key_id"></a> [kms\_key\_id](#input\_kms\_key\_id) | The ARN for the KMS encryption key. | `string` | n/a | yes |
+| <a name="input_kms_key_arn"></a> [kms\_key\_arn](#input\_kms\_key\_arn) | The ARN for the KMS encryption key. If not specified default RDS key alias/aws/rds will be used. | `string` | `null` | no |
 | <a name="input_master_username"></a> [master\_username](#input\_master\_username) | Username for the master DB user. Defaults to `root` | `string` | `"root"` | no |
 | <a name="input_performance_insights_enabled"></a> [performance\_insights\_enabled](#input\_performance\_insights\_enabled) | Specifies whether Performance Insights is enabled or not | `bool` | `null` | no |
 | <a name="input_performance_insights_kms_key_id"></a> [performance\_insights\_kms\_key\_id](#input\_performance\_insights\_kms\_key\_id) | The ARN for the KMS key to encrypt Performance Insights data | `string` | `null` | no |
@@ -92,9 +97,11 @@ No modules.
 | <a name="input_snapshot_identifier"></a> [snapshot\_identifier](#input\_snapshot\_identifier) | Specifies whether or not to create this cluster from a snapshot. You can use either the name or ARN when specifying a DB cluster snapshot, or the ARN when specifying a DB snapshot | `string` | `null` | no |
 | <a name="input_subnets"></a> [subnets](#input\_subnets) | List of subnet IDs used by database subnet group created | `list(string)` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to add to all resources | `map(string)` | n/a | yes |
-| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | ID of the VPC where to security group is created. | `string` | n/a | yes |
+| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | ID of the VPC where default security group is created. Required when 'security\_group\_external\_arn' is null | `string` | n/a | yes |
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_enhanced_monitoring_external_role_arn"></a> [enhanced\_monitoring\_external\_role\_arn](#output\_enhanced\_monitoring\_external\_role\_arn) | n/a |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
