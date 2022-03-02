@@ -1,4 +1,3 @@
-
 variable "identity" {
   description = <<-EOT
 Unique project identity objecty. Containts:
@@ -6,13 +5,21 @@ project - Unique project identifier across entire organization.
 environment - Name of environment. Possible values: dev[1-9]+, test[1-9]+, qa[1-9]+, green[1-9]+, blue[1-9]+, stage[1-9]+, uat[1-9]+, prod[1-9]+.
 project_repo - Name of project repository which uses this module.
 EOT
-  type = object({
+  type        = object({
     project      = string
     environment  = string
     project_repo = string
   })
   validation {
-    condition     = contains(flatten([for env_name in ["dev", "test", "qa", "green", "blue", "stage", "uat", "prod"] : [for num in ["", "1", "2", "3", "4", "5", "6", "7", "8", "9"] : "${env_name}${num}"]]), var.identity.environment) && length(var.identity.project) >= 2 && length(var.identity.project) <= 10 && var.identity.project_repo != null
+    condition     = contains(flatten([
+    for env_name in [
+      "dev", "test", "qa", "green", "blue", "stage", "uat", "prod"
+    ] : [
+    for num in [
+      "", "1", "2", "3", "4", "5", "6", "7", "8", "9"
+    ] : "${env_name}${num}"
+    ]
+    ]), var.identity.environment) && length(var.identity.project) >= 2 && length(var.identity.project) <= 10 && var.identity.project_repo != null
     error_message = "Value of 'environment' must be one of allowed values. Length of Variable 'project' must be between 2 and 10 characters. Value of 'project_repo' variable must not be null."
   }
 }
@@ -44,7 +51,9 @@ variable "engine" {
   type        = string
   default     = "aurora-postgresql"
   validation {
-    condition     = contains(["aurora", "aurora-mysql", "aurora-postgresql"], var.engine)
+    condition     = contains([
+      "aurora", "aurora-mysql", "aurora-postgresql"
+    ], var.engine)
     error_message = "Allowed values for engine are \"aurora\", \"aurora-mysql\", or \"aurora-postgresql\"."
   }
 }
@@ -61,7 +70,9 @@ variable "engine_mode" {
   type        = string
   default     = "provisioned"
   validation {
-    condition     = contains(["global", "parallelquery", "provisioned", "multimaster"], var.engine_mode)
+    condition     = contains([
+      "global", "parallelquery", "provisioned", "multimaster"
+    ], var.engine_mode)
     error_message = "Allowed values for engine_mode are \"global\", \"parallelquery-mysql\", \"provisioned\", or \"multimaster\"."
   }
 }
@@ -81,9 +92,6 @@ variable "enhanced_monitoring_interval_seconds" {
   type        = number
   default     = 60
 }
-
-# RDS security group configuration
-
 
 variable "backtrack_window" {
   description = "The target backtrack window, in seconds. Only available for `aurora` engine currently. To disable backtracking, set this value to 0. Must be between 0 and 259200 (72 hours)"
@@ -115,6 +123,22 @@ variable "ca_cert_identifier" {
   default     = null
 }
 
+# Network
+variable "vpc_id" {
+  description = "ID of the VPC where default security group is created. Required when 'security_group_external_arn' is null"
+  type        = string
+}
+variable "subnets" {
+  description = "List of subnet IDs used by database subnet group created"
+  type        = list(string)
+}
+variable "external_security_group_arn" {
+  description = "ID of the VPC where default security group is created. "
+  type        = string
+  default     = null
+}
+
+
 # aws_rds_cluster_role_association
 variable "iam_roles" {
   description = "Map of IAM roles and supported feature names to associate with the cluster"
@@ -135,10 +159,6 @@ variable "db_subnet_group_name" {
   default     = ""
 }
 
-variable "subnets" {
-  description = "List of subnet IDs used by database subnet group created"
-  type        = list(string)
-}
 
 variable "tags" {
   description = "A map of tags to add to all resources"
@@ -180,10 +200,6 @@ variable "preferred_maintenance_window" {
   default     = "sun:05:00-sun:06:00"
 }
 
-variable "vpc_id" {
-  description = "ID of the VPC where to security group is created."
-  type        = string
-}
 
 variable "iam_database_authentication_enabled" {
   description = "Specifies whether or mappings of AWS Identity and Access Management (IAM) accounts to database accounts is enabled."
