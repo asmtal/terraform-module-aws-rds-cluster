@@ -5,10 +5,6 @@ repos:
       - id: terraform_fmt
       - id: terraform_validate
       - id: terraform_docs
-        args:
-          - --hook-config=--path-to-file=__GIT_WORKING_DIR__/README.md
-          - --hook-config=--add-to-existing-file=true
-          - --hook-config=--create-file-if-not-exist=true
       - id: terraform_tflint
         args:
           - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl

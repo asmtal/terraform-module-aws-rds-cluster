@@ -1,5 +1,5 @@
 locals {
-  module_name = "terraform-module-rds-cluster"
+  module_name = "terraform-module-aws-rds-cluster"
   port        = coalesce(var.port, (var.engine == "aurora-postgresql" ? 5432 : 3306))
 
   db_subnet_group_name          = var.create_db_subnet_group ? join("", aws_db_subnet_group.this.*.name) : var.db_subnet_group_name
@@ -21,6 +21,13 @@ locals {
   create_enhanced_monitoring_role = var.enhanced_monitoring_enabled && var.enhanced_monitoring_external_role_arn == null
   enhanced_monitoring_role_arn    = local.create_enhanced_monitoring_role ? join("", aws_iam_role.rds_enhanced_monitoring.*.arn) : var.enhanced_monitoring_external_role_arn
   # enhanced monitoring end
+
+  db_credentials_json = {
+    username = var.master_username
+    password = join("", random_password.master_password[*].result)
+    name     = var.default_database_name
+    port     = local.port
+  }
 
   # use default aws key for rds if kms_key_arn is not passed
   kms_key_arn = var.kms_key_arn == null ? data.aws_kms_key.aws_rds.arn : var.kms_key_arn
@@ -75,8 +82,8 @@ resource "aws_rds_cluster" "this" {
   allow_major_version_upgrade         = var.allow_major_version_upgrade
   kms_key_id                          = local.kms_key_arn
   database_name                       = var.default_database_name
-  master_username                     = jsondecode(aws_secretsmanager_secret_version.rds_credentials_secret_version[count.index].secret_string)["username"]
-  master_password                     = jsondecode(aws_secretsmanager_secret_version.rds_credentials_secret_version[count.index].secret_string)["password"]
+  master_username                     = local.db_credentials_json.username
+  master_password                     = local.db_credentials_json.password
   final_snapshot_identifier           = "${local.name}-${element(concat(random_id.snapshot_identifier.*.hex, [""]), 0)}"
   skip_final_snapshot                 = var.skip_final_snapshot
   deletion_protection                 = var.deletion_protection
@@ -237,21 +244,12 @@ resource "aws_security_group" "this" {
 #  source_security_group_id = lookup(each.value, "source_security_group_id", null)
 #}
 
-
-resource "aws_secretsmanager_secret" "rds_credentials_secret" {
-  count       = var.enabled ? 1 : 0
-  name        = local.secret_name
-  description = "Database credentails for RDS Aurora ${local.name}"
-  tags        = local.tags
+module "database_credentials_secrets_manager" {
+  source        = "git@github.com:ck-ev-test/terraform-module-aws-secrets-manager.git?ref=v1.0.11"
+  enabled       = var.enabled
+  identity      = var.identity
+  context       = "${var.context}-rds-credentials"
+  description   = "Database credentails for RDS Aurora ${local.name}"
+  secret_string = jsonencode(local.db_credentials_json)
+  tags          = local.tags
 }
-resource "aws_secretsmanager_secret_version" "rds_credentials_secret_version" {
-  count     = var.enabled ? 1 : 0
-  secret_id = aws_secretsmanager_secret.rds_credentials_secret[count.index].id
-  secret_string = jsonencode({
-    username = var.master_username
-    password = random_password.master_password[count.index].result
-    name     = var.default_database_name
-    port     = local.port
-  })
-}
-# TODO implement secret rotation

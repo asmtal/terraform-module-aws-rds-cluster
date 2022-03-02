@@ -1,16 +1,25 @@
+# AWS RDS Cluster Terraform module
+
+Terraform module which creates AWS RDS Cluster resources.
 #### Table of Contents
-1. [Using pre-commit locally](#using-pre-commit-locally) 
-2. [Usage](#usage)
-3. [Requirements](#requirements)
-4. [Providers](#Providers)
-5. [Inputs](#inputs)
-6. [Outputs](#outputs)
+1. [Available Features](#available-features)
+2. [TODO](#available-features)
+3. [Using pre-commit locally](#using-pre-commit-locally) 
+4. [Usage](#usage)
+5. [Requirements](#requirements)
+6. [Providers](#Providers)
+7. [Inputs](#inputs)
+8. [Outputs](#outputs)
+
+## Available Features
+- string & binary secret creation
+
+## TODO
+- secret policy
+- secret rotation
+
 ## Using pre-commit locally
 https://github.com/antonbabenko/pre-commit-terraform#how-to-install
-### set environment variable used by gitBub actions
-`
-set __GIT_WORKING_DIR__=.
-`
 ## Usage
 *various commands
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
@@ -18,7 +27,7 @@ set __GIT_WORKING_DIR__=.
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.1.6 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.3.0 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | >= 3.1.0 |
 
@@ -26,12 +35,14 @@ set __GIT_WORKING_DIR__=.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.2.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.3.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | 3.1.0 |
 
 ## Modules
 
-No modules.
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_database_credentials_secrets_manager"></a> [database\_credentials\_secrets\_manager](#module\_database\_credentials\_secrets\_manager) | git@github.com:ck-ev-test/terraform-module-aws-secrets-manager.git | v1.0.11 |
 
 ## Resources
 
@@ -43,8 +54,6 @@ No modules.
 | [aws_rds_cluster.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/rds_cluster) | resource |
 | [aws_rds_cluster_instance.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/rds_cluster_instance) | resource |
 | [aws_rds_cluster_role_association.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/rds_cluster_role_association) | resource |
-| [aws_secretsmanager_secret.rds_credentials_secret](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
-| [aws_secretsmanager_secret_version.rds_credentials_secret_version](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
 | [aws_security_group.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [random_id.snapshot_identifier](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [random_password.master_password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |

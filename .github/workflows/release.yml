@@ -10,7 +10,9 @@ on:
       - '**/*.py'
       - '**/*.tf'
       - '.github/workflows/release.yml'
-
+      - 'README.md'
+permissions:
+  contents: write
 jobs:
   release:
     name: Release
@@ -31,7 +33,7 @@ jobs:
             @semantic-release/git@10.0.0
             conventional-changelog-conventionalcommits@4.6.3
         env:
-          GITHUB_TOKEN: ${{ secrets.SEMANTIC_RELEASE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Print published version
         if: steps.semantic.outputs.new_release_published == 'true'
         run: |
