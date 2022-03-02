@@ -7,7 +7,7 @@
 6. [Outputs](#outputs)
 ## Using pre-commit locally
 https://github.com/antonbabenko/pre-commit-terraform#how-to-install
-### set environment vareiable used in github actions
+### set environment variable used by gitBub actions
 `
 set __GIT_WORKING_DIR__=.
 `
