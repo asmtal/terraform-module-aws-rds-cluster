@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### [1.4.5](https://github.com/ck-ev-test/terraform-module-aws-rds-cluster/compare/v1.4.4...v1.4.5) (2022-03-03)
+
+
+### Bug Fixes
+
+* upgrade secrets manager module version ([bdeb3bb](https://github.com/ck-ev-test/terraform-module-aws-rds-cluster/commit/bdeb3bb7eec6593d32e18244baa2b5ab14862026))
+
 ### [1.4.4](https://github.com/ck-ev-test/terraform-module-aws-rds-cluster/compare/v1.4.3...v1.4.4) (2022-03-03)
 
 
