@@ -161,8 +161,9 @@ variable "db_subnet_group_name" {
 
 
 variable "tags" {
-  description = "A map of tags to add to all resources"
+  description = "(Optional) A map of tags to add to all resources."
   type        = map(string)
+  default     = {}
 }
 
 variable "instance_class" {
@@ -281,4 +282,11 @@ variable "copy_tags_to_snapshot" {
   description = "Copy all Cluster `tags` to snapshots"
   type        = bool
   default     = true
+}
+
+
+variable "parent_terraform_module" {
+  description = "(Optional) Name of parent terraform module. Used for tagging."
+  type        = string
+  default     = null
 }

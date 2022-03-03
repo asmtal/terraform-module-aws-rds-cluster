@@ -42,7 +42,7 @@ https://github.com/antonbabenko/pre-commit-terraform#how-to-install
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_database_credentials_secrets_manager"></a> [database\_credentials\_secrets\_manager](#module\_database\_credentials\_secrets\_manager) | git@github.com:ck-ev-test/terraform-module-aws-secrets-manager.git | v1.0.14 |
+| <a name="module_database_credentials_secrets_manager"></a> [database\_credentials\_secrets\_manager](#module\_database\_credentials\_secrets\_manager) | git@github.com:ck-ev-test/terraform-module-aws-secrets-manager.git | v1.1.2 |
 
 ## Resources
 
@@ -95,6 +95,7 @@ https://github.com/antonbabenko/pre-commit-terraform#how-to-install
 | <a name="input_instances_count"></a> [instances\_count](#input\_instances\_count) | Indicates the number of db instances. Default `2` | `number` | `2` | no |
 | <a name="input_kms_key_arn"></a> [kms\_key\_arn](#input\_kms\_key\_arn) | The ARN for the KMS encryption key. If not specified default RDS key alias/aws/rds will be used. | `string` | `null` | no |
 | <a name="input_master_username"></a> [master\_username](#input\_master\_username) | Username for the master DB user. Defaults to `root` | `string` | `"root"` | no |
+| <a name="input_parent_terraform_module"></a> [parent\_terraform\_module](#input\_parent\_terraform\_module) | (Optional) Name of parent terraform module. Used for tagging. | `string` | `null` | no |
 | <a name="input_performance_insights_enabled"></a> [performance\_insights\_enabled](#input\_performance\_insights\_enabled) | Specifies whether Performance Insights is enabled or not | `bool` | `null` | no |
 | <a name="input_performance_insights_kms_key_id"></a> [performance\_insights\_kms\_key\_id](#input\_performance\_insights\_kms\_key\_id) | The ARN for the KMS key to encrypt Performance Insights data | `string` | `null` | no |
 | <a name="input_performance_insights_retention_period"></a> [performance\_insights\_retention\_period](#input\_performance\_insights\_retention\_period) | Amount of time in days to retain Performance Insights data. Either 7 (7 days) or 731 (2 years) | `number` | `null` | no |
@@ -105,7 +106,7 @@ https://github.com/antonbabenko/pre-commit-terraform#how-to-install
 | <a name="input_skip_final_snapshot"></a> [skip\_final\_snapshot](#input\_skip\_final\_snapshot) | Determines whether a final snapshot is created before the cluster is deleted. If true is specified, no snapshot is created | `bool` | `null` | no |
 | <a name="input_snapshot_identifier"></a> [snapshot\_identifier](#input\_snapshot\_identifier) | Specifies whether or not to create this cluster from a snapshot. You can use either the name or ARN when specifying a DB cluster snapshot, or the ARN when specifying a DB snapshot | `string` | `null` | no |
 | <a name="input_subnets"></a> [subnets](#input\_subnets) | List of subnet IDs used by database subnet group created | `list(string)` | n/a | yes |
-| <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to add to all resources | `map(string)` | n/a | yes |
+| <a name="input_tags"></a> [tags](#input\_tags) | (Optional) A map of tags to add to all resources. | `map(string)` | `{}` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | ID of the VPC where default security group is created. Required when 'security\_group\_external\_arn' is null | `string` | n/a | yes |
 
 ## Outputs

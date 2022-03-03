@@ -1,6 +1,7 @@
 locals {
-  module_name = "terraform-module-aws-rds-cluster"
-  port        = coalesce(var.port, (var.engine == "aurora-postgresql" ? 5432 : 3306))
+  module_name          = "terraform-module-aws-rds-cluster"
+  computed_module_name = var.parent_terraform_module != null ? "${var.parent_terraform_module}/${local.module_name}" : local.module_name
+  port                 = coalesce(var.port, (var.engine == "aurora-postgresql" ? 5432 : 3306))
 
   db_subnet_group_name          = var.create_db_subnet_group ? join("", aws_db_subnet_group.this.*.name) : var.db_subnet_group_name
   internal_db_subnet_group_name = try(coalesce(var.db_subnet_group_name, local.name), "")
@@ -9,7 +10,7 @@ locals {
   rds_security_group_id = join("", aws_security_group.this.*.id)
 
   tags = merge({
-    TerraformModule = local.module_name
+    TerraformModule = local.computed_module_name
   }, var.tags)
   #resources names
   name        = "${var.identity.project}-${var.context}-${var.identity.environment}"
@@ -193,7 +194,7 @@ resource "aws_security_group" "this" {
 
   name        = local.sg_gr_name
   vpc_id      = var.vpc_id
-  description = "Control traffic to/from RDS Aurora ${local.name}"
+  description = "Controls traffic to/from RDS Aurora ${local.name}"
 
   tags = merge({ Name = local.sg_gr_name }, local.tags)
 }
@@ -245,11 +246,12 @@ resource "aws_security_group" "this" {
 #}
 
 module "database_credentials_secrets_manager" {
-  source        = "git@github.com:ck-ev-test/terraform-module-aws-secrets-manager.git?ref=v1.0.14"
-  enabled       = var.enabled
-  identity      = var.identity
-  context       = "${var.context}-rds-credentials"
-  description   = "Database credentails for RDS Aurora ${local.name}"
-  secret_string = jsonencode(local.db_credentials_json)
-  tags          = local.tags
+  source                  = "git@github.com:ck-ev-test/terraform-module-aws-secrets-manager.git?ref=v1.1.2"
+  enabled                 = var.enabled
+  identity                = var.identity
+  context                 = "${var.context}-rds-credentials"
+  description             = "Database credentails for RDS Aurora ${local.name}"
+  secret_string           = jsonencode(local.db_credentials_json)
+  parent_terraform_module = local.computed_module_name
+  tags                    = local.tags
 }
