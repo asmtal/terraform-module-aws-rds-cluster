@@ -245,7 +245,7 @@ resource "aws_security_group" "this" {
 #}
 
 module "database_credentials_secrets_manager" {
-  source        = "git@github.com:ck-ev-test/terraform-module-aws-secrets-manager.git?ref=v1.0.11"
+  source        = "git@github.com:ck-ev-test/terraform-module-aws-secrets-manager.git?ref=v1.0.14"
   enabled       = var.enabled
   identity      = var.identity
   context       = "${var.context}-rds-credentials"
