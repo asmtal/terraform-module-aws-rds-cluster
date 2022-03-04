@@ -26,7 +26,7 @@ EOT
 
 variable "context" {
   type        = string
-  description = "Context of module usage. Will be used as name/id in all created resources. Max 10 characters. E.g. `backend`, `frontend` etc."
+  description = "Context of module usage. Will be used as name/id in all created resources. Min 2, Max 14 characters. E.g. `backend`, `frontend` etc."
   validation {
     condition     = length(var.context) >= 2 && length(var.context) <= 14
     error_message = "The `context` variable length must be between 2 and 14 characters."

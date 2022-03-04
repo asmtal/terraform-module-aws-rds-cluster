@@ -42,7 +42,7 @@ https://github.com/antonbabenko/pre-commit-terraform#how-to-install
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_database_credentials_secrets_manager"></a> [database\_credentials\_secrets\_manager](#module\_database\_credentials\_secrets\_manager) | git@github.com:ck-ev-test/terraform-module-aws-secrets-manager.git | v1.1.2 |
+| <a name="module_database_credentials_secrets_manager"></a> [database\_credentials\_secrets\_manager](#module\_database\_credentials\_secrets\_manager) | ../terraform-module-aws-secrets-manager | n/a |
 
 ## Resources
 

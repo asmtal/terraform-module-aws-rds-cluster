@@ -1,5 +1,5 @@
 locals {
-  module_name          = "terraform-module-aws-rds-cluster"
+  module_name          = "aws-rds-cluster"
   computed_module_name = var.parent_terraform_module != null ? "${var.parent_terraform_module}/${local.module_name}" : local.module_name
   port                 = coalesce(var.port, (var.engine == "aurora-postgresql" ? 5432 : 3306))
 
@@ -197,6 +197,10 @@ resource "aws_security_group" "this" {
   description = "Controls traffic to/from RDS Aurora ${local.name}"
 
   tags = merge({ Name = local.sg_gr_name }, local.tags)
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 #
 ## TODO - change to map of ingress rules under one resource at next breaking change
@@ -246,12 +250,13 @@ resource "aws_security_group" "this" {
 #}
 
 module "database_credentials_secrets_manager" {
-  source                  = "git@github.com:ck-ev-test/terraform-module-aws-secrets-manager.git?ref=v1.1.2"
+  #  source                  = "git@github.com:ck-ev-test/terraform-module-aws-secrets-manager.git?ref=v1.1.2"
+  source                  = "../terraform-module-aws-secrets-manager"
   enabled                 = var.enabled
   identity                = var.identity
   context                 = "${var.context}-rds-credentials"
   description             = "Database credentails for RDS Aurora ${local.name}"
   secret_string           = jsonencode(local.db_credentials_json)
   parent_terraform_module = local.computed_module_name
-  tags                    = local.tags
+  tags                    = var.tags
 }
