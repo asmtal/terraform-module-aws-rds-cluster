@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### [1.4.6](https://github.com/ck-ev-test/terraform-module-aws-rds-cluster/compare/v1.4.5...v1.4.6) (2022-03-03)
+
+
+### Bug Fixes
+
+* upgrade parent terraform module ([c8d71ba](https://github.com/ck-ev-test/terraform-module-aws-rds-cluster/commit/c8d71ba08d0c27ef9994a793e85829c0be803fdb))
+
 ### [1.4.5](https://github.com/ck-ev-test/terraform-module-aws-rds-cluster/compare/v1.4.4...v1.4.5) (2022-03-03)
 
 
